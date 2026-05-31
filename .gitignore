@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Local env and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.sqlite
+*.db
+
+# Generated output
+artifacts/
+coverage/
+dist/
+build/
+
+# OS/editor noise
+.DS_Store
+.idea/
+.vscode/
+
+# Python/tool caches
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.venv/
+.venv-tools/
