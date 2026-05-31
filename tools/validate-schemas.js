@@ -125,13 +125,13 @@ if (receipt) {
   if (receipt.properties.ack_required.const !== true) fail('receipt export ack_required must be const true');
 }
 
-const transport = fs.existsSync(path.join(ROOT, 'docs/transport-boundary.md')) ? readText('docs/transport-boundary.md') : '';
-for (const phrase of ['API-mediated writes', 'SSH Git is disabled', 'smart HTTP Git is disabled', 'TOCTOU']) {
+const transport = fs.existsSync(path.join(ROOT, 'docs/transport-boundary.md')) ? readText('docs/transport-boundary.md').toLowerCase() : '';
+for (const phrase of ['api-mediated writes', 'ssh git is disabled', 'smart http git is disabled', 'toctou']) {
   if (!transport.includes(phrase)) fail(`transport boundary must mention: ${phrase}`);
 }
 
-const threat = fs.existsSync(path.join(ROOT, 'docs/threat-model.md')) ? readText('docs/threat-model.md') : '';
-for (const phrase of ['Token replay', 'Direct Gitea bypass', 'Path traversal', 'Audit truncation', 'Policy/grant service outage']) {
+const threat = fs.existsSync(path.join(ROOT, 'docs/threat-model.md')) ? readText('docs/threat-model.md').toLowerCase() : '';
+for (const phrase of ['token replay', 'direct gitea bypass', 'path traversal', 'audit truncation', 'policy/grant service outage']) {
   if (!threat.includes(phrase)) fail(`threat model must mention: ${phrase}`);
 }
 
