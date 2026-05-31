@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://schemas.socioprophet.org/gitea-sovereign/control-config.schema.json",
+  "title": "SourceControlBoundaryConfig",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["node_id", "audience", "mode", "policy", "grants", "path_policy"],
+  "properties": {
+    "node_id": { "type": "string", "minLength": 1 },
+    "audience": { "type": "string", "const": "gitea-sovereign" },
+    "mode": { "type": "string", "enum": ["no-network", "runtime"] },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resolver", "fail_closed_for_writes"],
+      "properties": {
+        "resolver": { "type": "string", "enum": ["stub-deny", "stub-allow-readonly"] },
+        "fail_closed_for_writes": { "type": "boolean", "const": true }
+      }
+    },
+    "grants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resolver", "fail_closed_for_writes"],
+      "properties": {
+        "resolver": { "type": "string", "enum": ["stub-deny", "stub-allow-readonly"] },
+        "fail_closed_for_writes": { "type": "boolean", "const": true }
+      }
+    },
+    "path_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deny_wins", "normalize_unicode", "decode_url_encoding"],
+      "properties": {
+        "deny_wins": { "type": "boolean", "const": true },
+        "normalize_unicode": { "type": "boolean", "const": true },
+        "decode_url_encoding": { "type": "boolean", "const": true },
+        "default_deny": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+      }
+    }
+  }
+}
