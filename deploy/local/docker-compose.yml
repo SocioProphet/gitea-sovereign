@@ -1,0 +1,48 @@
+name: gitea-sovereign-local
+
+services:
+  org-gitea:
+    image: gitea/gitea:1.26.2-rootless
+    restart: "no"
+    environment:
+      GITEA__server__ROOT_URL: http://org-gitea:3000/
+      GITEA__server__HTTP_PORT: "3000"
+      GITEA__server__DISABLE_SSH: "true"
+      GITEA__server__START_SSH_SERVER: "false"
+      GITEA__security__INSTALL_LOCK: "true"
+      GITEA__service__DISABLE_REGISTRATION: "true"
+    expose:
+      - "3000"
+    networks:
+      - source_control_internal
+    volumes:
+      - org-gitea-data:/var/lib/gitea
+      - org-gitea-config:/etc/gitea
+
+  node-gitea:
+    image: gitea/gitea:1.26.2-rootless
+    restart: "no"
+    environment:
+      GITEA__server__ROOT_URL: http://node-gitea:3000/
+      GITEA__server__HTTP_PORT: "3000"
+      GITEA__server__DISABLE_SSH: "true"
+      GITEA__server__START_SSH_SERVER: "false"
+      GITEA__security__INSTALL_LOCK: "true"
+      GITEA__service__DISABLE_REGISTRATION: "true"
+    expose:
+      - "3000"
+    networks:
+      - source_control_internal
+    volumes:
+      - node-gitea-data:/var/lib/gitea
+      - node-gitea-config:/etc/gitea
+
+networks:
+  source_control_internal:
+    internal: true
+
+volumes:
+  org-gitea-data:
+  org-gitea-config:
+  node-gitea-data:
+  node-gitea-config:
