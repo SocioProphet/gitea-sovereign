@@ -1,0 +1,34 @@
+{
+  "runtime_mode": "disabled",
+  "local_scaffold_default": true,
+  "bindings": {
+    "gitea": {
+      "enabled": false,
+      "mode": "local-only",
+      "dependency_ref": "docs/adr/0006-runtime-binding-gates.md#gitea"
+    },
+    "upstream_refs": {
+      "enabled": false,
+      "mode": "local-only",
+      "dependency_ref": "docs/adr/0006-runtime-binding-gates.md#upstream-refs"
+    },
+    "ledger_export": {
+      "enabled": false,
+      "mode": "local-only",
+      "dependency_ref": "docs/adr/0006-runtime-binding-gates.md#ledger-export"
+    },
+    "git_transport": {
+      "enabled": false,
+      "mode": "disabled",
+      "dependency_ref": "docs/path-boundary.md#runtime-gate",
+      "enforcement_design_ref": "docs/adr/0004-git-transport-v1-limits.md"
+    }
+  },
+  "guards": {
+    "fail_closed_dependencies": true,
+    "audit_chain_required": true,
+    "evidence_required": true,
+    "negative_tests_required": true,
+    "raw_material_logging_forbidden": true
+  }
+}
