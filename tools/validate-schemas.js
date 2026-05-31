@@ -19,6 +19,7 @@ const REQUIRED_FILES = [
   'schemas/agent-registration.schema.json',
   'schemas/receipt-export.schema.json',
   'schemas/control-config.schema.json',
+  'schemas/runtime-config.schema.json',
   'gateway/control-boundary.js',
   'core/canonical.js',
   'core/nonce-store.js',
@@ -36,6 +37,7 @@ const REQUIRED_FILES = [
   'test/reference-resolver.test.js',
   'test/receipt-export.test.js',
   'test/local-mvp.test.js',
+  'test/runtime-config.test.js',
   'docs/authority-boundaries.md',
   'docs/transport-boundary.md',
   'docs/threat-model.md',
@@ -53,6 +55,7 @@ const REQUIRED_FILES = [
   'docs/adr/0006-runtime-binding-gates.md',
   'examples/valid/token.example.json',
   'examples/valid/intent.example.json',
+  'examples/valid/runtime-config.disabled.example.json',
   'examples/attacks/replay-nonce.attack.json',
   'examples/attacks/path-traversal.attack.json',
   'examples/attacks/direct-gitea-bypass.attack.json',
@@ -121,6 +124,31 @@ if (controlConfig) {
     if (!controlConfig.properties[key]) fail(`control config schema must include ${key}`);
   }
   if (controlConfig.properties.mode.enum.includes('runtime') !== true) fail('control config must reserve runtime mode');
+}
+
+const runtimeConfig = readJson('schemas/runtime-config.schema.json');
+if (runtimeConfig) {
+  for (const key of ['runtime_mode', 'local_scaffold_default', 'bindings', 'guards']) {
+    if (!runtimeConfig.properties[key]) fail(`runtime config schema must include ${key}`);
+  }
+  if (!runtimeConfig.properties.runtime_mode.enum.includes('disabled')) fail('runtime config must include disabled mode');
+  if (!runtimeConfig.properties.runtime_mode.enum.includes('enabled')) fail('runtime config must reserve enabled mode');
+  if (runtimeConfig.properties.local_scaffold_default.const !== true) fail('runtime config must preserve local scaffold default');
+  if (runtimeConfig.definitions.transportBinding.properties.enabled.const !== false) fail('git transport must remain disabled in scaffold schema');
+}
+
+const runtimeDisabled = readJson('examples/valid/runtime-config.disabled.example.json');
+if (runtimeDisabled) {
+  if (runtimeDisabled.runtime_mode !== 'disabled') fail('runtime disabled fixture must set runtime_mode=disabled');
+  if (runtimeDisabled.local_scaffold_default !== true) fail('runtime disabled fixture must preserve local scaffold default');
+  for (const key of ['gitea', 'upstream_refs', 'ledger_export']) {
+    if (runtimeDisabled.bindings[key].enabled !== false) fail(`runtime disabled fixture must disable ${key}`);
+  }
+  if (runtimeDisabled.bindings.git_transport.enabled !== false) fail('runtime disabled fixture must disable git transport');
+  if (runtimeDisabled.bindings.git_transport.mode !== 'disabled') fail('runtime disabled fixture git transport mode must be disabled');
+  for (const key of Object.keys(runtimeDisabled.guards)) {
+    if (runtimeDisabled.guards[key] !== true) fail(`runtime disabled fixture guard must be true: ${key}`);
+  }
 }
 
 const token = readJson('schemas/token.schema.json');
