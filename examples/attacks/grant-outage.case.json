@@ -1,0 +1,6 @@
+{
+  "case_id": "grant-outage",
+  "description": "Grant decision reference cannot be resolved. Runtime must fail closed for write operations and emit a blocked operation receipt.",
+  "expected_result": "blocked",
+  "expected_event_type": "git.op.blocked"
+}
