@@ -1,0 +1,6 @@
+{
+  "case_id": "policy-outage",
+  "description": "Policy decision reference cannot be resolved. Runtime must fail closed for write operations and may allow only explicitly whitelisted read-only health checks.",
+  "expected_result": "blocked",
+  "expected_event_type": "git.op.blocked"
+}
