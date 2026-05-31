@@ -24,10 +24,12 @@ const REQUIRED_FILES = [
   'core/nonce-store.js',
   'core/local-authority.js',
   'core/audit-chain.js',
+  'core/native-adapter.js',
   'deploy/local/docker-compose.yml',
   'test/control-boundary.test.js',
   'test/local-core.test.js',
   'test/local-substrate.test.js',
+  'test/native-adapter.test.js',
   'docs/authority-boundaries.md',
   'docs/transport-boundary.md',
   'docs/threat-model.md',
@@ -160,7 +162,8 @@ const localCoreFiles = [
   'core/canonical.js',
   'core/nonce-store.js',
   'core/local-authority.js',
-  'core/audit-chain.js'
+  'core/audit-chain.js',
+  'core/native-adapter.js'
 ];
 for (const rel of localCoreFiles) {
   const body = fs.existsSync(path.join(ROOT, rel)) ? readText(rel) : '';
@@ -181,6 +184,12 @@ const audit = fs.existsSync(path.join(ROOT, 'core/audit-chain.js')) ? readText('
 for (const phrase of ['AuditChain', 'append', 'verify', 'ZERO_HASH']) {
   if (!audit.includes(phrase)) fail(`audit chain core must include: ${phrase}`);
 }
+
+const nativeAdapter = fs.existsSync(path.join(ROOT, 'core/native-adapter.js')) ? readText('core/native-adapter.js') : '';
+for (const phrase of ['issueNativeReceipt', 'revokeNativeReceipt', 'materialDigest', 'materialSuffix']) {
+  if (!nativeAdapter.includes(phrase)) fail(`native adapter scaffold must include: ${phrase}`);
+}
+if (/raw_material|native_token|access_token/i.test(nativeAdapter)) fail('native adapter scaffold must not expose raw/native token field names');
 
 const compose = fs.existsSync(path.join(ROOT, 'deploy/local/docker-compose.yml')) ? readText('deploy/local/docker-compose.yml') : '';
 if (!compose.includes('gitea/gitea:1.26.2-rootless')) fail('local compose must pin gitea/gitea:1.26.2-rootless');
