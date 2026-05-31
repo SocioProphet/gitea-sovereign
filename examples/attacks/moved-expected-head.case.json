@@ -1,0 +1,6 @@
+{
+  "case_id": "moved-expected-head",
+  "description": "Branch head changed after approval. Runtime must re-check expected_head immediately before write and block if it differs.",
+  "expected_result": "blocked",
+  "expected_event_type": "git.op.blocked"
+}
