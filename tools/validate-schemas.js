@@ -27,6 +27,7 @@ const REQUIRED_FILES = [
   'core/native-adapter.js',
   'core/reference-resolver.js',
   'core/receipt-export.js',
+  'demo/local-mvp.js',
   'deploy/local/docker-compose.yml',
   'test/control-boundary.test.js',
   'test/local-core.test.js',
@@ -34,12 +35,14 @@ const REQUIRED_FILES = [
   'test/native-adapter.test.js',
   'test/reference-resolver.test.js',
   'test/receipt-export.test.js',
+  'test/local-mvp.test.js',
   'docs/authority-boundaries.md',
   'docs/transport-boundary.md',
   'docs/threat-model.md',
   'docs/backlog.md',
   'docs/local-substrate-topology.md',
   'docs/reference-state-mapping.md',
+  'docs/local-mvp-demo.md',
   'docs/adr/0001-authority-boundaries.md',
   'docs/adr/0002-token-gateway-vs-native-gitea-token.md',
   'docs/adr/0003-audit-chain-and-export.md',
@@ -170,7 +173,8 @@ const localCoreFiles = [
   'core/audit-chain.js',
   'core/native-adapter.js',
   'core/reference-resolver.js',
-  'core/receipt-export.js'
+  'core/receipt-export.js',
+  'demo/local-mvp.js'
 ];
 for (const rel of localCoreFiles) {
   const body = fs.existsSync(path.join(ROOT, rel)) ? readText(rel) : '';
@@ -208,9 +212,19 @@ for (const phrase of ['buildExportBatch', 'verifyExportBatch', 'acknowledgeExpor
   if (!receiptExport.includes(phrase)) fail(`receipt export scaffold must include: ${phrase}`);
 }
 
+const demo = fs.existsSync(path.join(ROOT, 'demo/local-mvp.js')) ? readText('demo/local-mvp.js') : '';
+for (const phrase of ['runLocalMvpDemo', 'AuditChain', 'verifyExportBatch', 'acknowledgeExportBatch', 'live_calls: false']) {
+  if (!demo.includes(phrase)) fail(`local MVP demo must include: ${phrase}`);
+}
+
 const mapping = fs.existsSync(path.join(ROOT, 'docs/reference-state-mapping.md')) ? readText('docs/reference-state-mapping.md').toLowerCase() : '';
 for (const phrase of ['ok', 'block', 'stale', 'unknown', 'local state']) {
   if (!mapping.includes(phrase)) fail(`reference state mapping doc must mention: ${phrase}`);
+}
+
+const demoDoc = fs.existsSync(path.join(ROOT, 'docs/local-mvp-demo.md')) ? readText('docs/local-mvp-demo.md').toLowerCase() : '';
+for (const phrase of ['local mvp demo', 'audit verification must pass before export batch creation', 'live_calls', 'no external service calls']) {
+  if (!demoDoc.includes(phrase)) fail(`local MVP demo doc must mention: ${phrase}`);
 }
 
 const compose = fs.existsSync(path.join(ROOT, 'deploy/local/docker-compose.yml')) ? readText('deploy/local/docker-compose.yml') : '';
