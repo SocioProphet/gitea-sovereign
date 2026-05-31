@@ -11,6 +11,19 @@ const NOW = 1800000000;
 const KEY = 'local-mvp-test-key';
 const NODE_ID = 'node-a';
 
+function assertRequestWithinGrantScope(request, grant) {
+  const scope = grant && grant.scope ? grant.scope : {};
+  const repoOk = Array.isArray(scope.repos) && scope.repos.includes(request.repo);
+  const branchOk = Array.isArray(scope.branches) && scope.branches.includes(request.branch);
+  const opOk = Array.isArray(scope.ops) && scope.ops.includes(request.op);
+
+  if (!repoOk) return { allowed: false, reason: 'scope.repo' };
+  if (!branchOk) return { allowed: false, reason: 'scope.branch' };
+  if (!opOk) return { allowed: false, reason: 'scope.op' };
+
+  return { allowed: true, reason: 'scope.allowed' };
+}
+
 function runLocalMvpDemo() {
   const request = {
     op: 'read',
@@ -68,6 +81,9 @@ function runLocalMvpDemo() {
   const nonceStore = new NonceStore();
   const grantVerification = verifyLocalGrant(grant, KEY, nonceStore, NOW + 1);
   if (!grantVerification.ok) throw new Error(`grant failed: ${grantVerification.reason}`);
+
+  const scopeDecision = assertRequestWithinGrantScope(request, grant);
+  if (!scopeDecision.allowed) throw new Error(`scope failed: ${scopeDecision.reason}`);
 
   const replayVerification = verifyLocalGrant(grant, KEY, nonceStore, NOW + 2);
 
@@ -151,6 +167,7 @@ function runLocalMvpDemo() {
     reference_decision: referenceDecision.reason,
     reference_receipt_hash: referenceReceipt.receipt_hash,
     grant_verification: grantVerification.reason,
+    scope_decision: scopeDecision.reason,
     replay_verification: replayVerification.reason,
     audit_verification: auditVerification.reason,
     native_receipt_hash: nativeReceipt.receipt_hash,
@@ -164,4 +181,4 @@ if (require.main === module) {
   process.stdout.write(`${JSON.stringify(runLocalMvpDemo(), null, 2)}\n`);
 }
 
-module.exports = { runLocalMvpDemo };
+module.exports = { assertRequestWithinGrantScope, runLocalMvpDemo };
