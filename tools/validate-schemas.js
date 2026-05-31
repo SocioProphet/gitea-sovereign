@@ -43,11 +43,14 @@ const REQUIRED_FILES = [
   'docs/local-substrate-topology.md',
   'docs/reference-state-mapping.md',
   'docs/local-mvp-demo.md',
+  'docs/canonicalization.md',
+  'docs/path-boundary.md',
   'docs/adr/0001-authority-boundaries.md',
   'docs/adr/0002-token-gateway-vs-native-gitea-token.md',
   'docs/adr/0003-audit-chain-and-export.md',
   'docs/adr/0004-git-transport-v1-limits.md',
   'docs/adr/0005-key-storage-and-rotation-v1.md',
+  'docs/adr/0006-runtime-binding-gates.md',
   'examples/valid/token.example.json',
   'examples/valid/intent.example.json',
   'examples/attacks/replay-nonce.attack.json',
@@ -186,6 +189,11 @@ for (const phrase of ['canonicalize', 'sha256Hex', 'hmacSha256Hex', 'stableHash'
   if (!canonical.includes(phrase)) fail(`canonical helper must include: ${phrase}`);
 }
 
+const canonicalDoc = fs.existsSync(path.join(ROOT, 'docs/canonicalization.md')) ? readText('docs/canonicalization.md').toLowerCase() : '';
+for (const phrase of ['bootstrap local scaffold only', 'not claimed to be a complete rfc 8785', 'runtime-mode signing']) {
+  if (!canonicalDoc.includes(phrase)) fail(`canonicalization doc must mention: ${phrase}`);
+}
+
 const localAuthority = fs.existsSync(path.join(ROOT, 'core/local-authority.js')) ? readText('core/local-authority.js') : '';
 for (const phrase of ['issueLocalGrant', 'verifyLocalGrant', 'revokeLocalGrant', 'DEFAULT_TTL_SECONDS']) {
   if (!localAuthority.includes(phrase)) fail(`local authority core must include: ${phrase}`);
@@ -225,6 +233,16 @@ for (const phrase of ['ok', 'block', 'stale', 'unknown', 'local state']) {
 const demoDoc = fs.existsSync(path.join(ROOT, 'docs/local-mvp-demo.md')) ? readText('docs/local-mvp-demo.md').toLowerCase() : '';
 for (const phrase of ['local mvp demo', 'audit verification must pass before export batch creation', 'live_calls', 'no external service calls']) {
   if (!demoDoc.includes(phrase)) fail(`local MVP demo doc must mention: ${phrase}`);
+}
+
+const pathDoc = fs.existsSync(path.join(ROOT, 'docs/path-boundary.md')) ? readText('docs/path-boundary.md').toLowerCase() : '';
+for (const phrase of ['authorization-path handling must fail closed', 'deny-wins rule', 'changed-path extraction', 'transport-specific enforcement']) {
+  if (!pathDoc.includes(phrase)) fail(`path boundary doc must mention: ${phrase}`);
+}
+
+const runtimeAdr = fs.existsSync(path.join(ROOT, 'docs/adr/0006-runtime-binding-gates.md')) ? readText('docs/adr/0006-runtime-binding-gates.md').toLowerCase() : '';
+for (const phrase of ['runtime binding gates', 'explicit reviewed runtime-mode gate', 'fail-closed behavior', 'local scaffold behavior preserved']) {
+  if (!runtimeAdr.includes(phrase)) fail(`runtime binding ADR must mention: ${phrase}`);
 }
 
 const compose = fs.existsSync(path.join(ROOT, 'deploy/local/docker-compose.yml')) ? readText('deploy/local/docker-compose.yml') : '';
