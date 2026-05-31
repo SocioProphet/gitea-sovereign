@@ -10,7 +10,9 @@ function canonicalize(value) {
   if (typeof value === 'boolean') return value ? 'true' : 'false';
   if (Array.isArray(value)) return `[${value.map((item) => canonicalize(item)).join(',')}]`;
   if (typeof value === 'object') {
-    const keys = Object.keys(value).sort();
+    const keys = Object.keys(value)
+      .filter((key) => value[key] !== undefined)
+      .sort();
     return `{${keys.map((key) => `${JSON.stringify(key)}:${canonicalize(value[key])}`).join(',')}}`;
   }
   throw new Error(`unsupported canonical value type: ${typeof value}`);
