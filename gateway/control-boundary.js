@@ -1,32 +1,32 @@
-/*
- * PR-B no-network control boundary.
- * This module parses source-control requests and evaluates local boundary rules.
- * It does not forward to Gitea, create credentials, open sockets, or mutate infrastructure.
- */
-
 const WRITE_OPS = new Set(['commit', 'push', 'branch-create', 'branch-delete', 'pr-open', 'pr-merge', 'tag']);
+const WINDOWS_DRIVE_PREFIX = /^[A-Za-z]:[\\/]/;
+const CONTROL_CHARS = /[\u0000-\u001f\u007f]/;
 
 function decodePath(input) {
   try {
-    return decodeURIComponent(input);
+    return { ok: true, value: decodeURIComponent(input) };
   } catch (_err) {
-    return input;
+    return { ok: false, value: null };
   }
 }
 
 function normalizePath(input) {
-  if (typeof input !== 'string' || input.length === 0) return '';
-  const decoded = decodePath(input).normalize('NFC').replace(/\\/g, '/');
-  const parts = [];
-  for (const part of decoded.split('/')) {
-    if (!part || part === '.') continue;
-    if (part === '..') {
-      if (parts.length === 0) return null;
-      parts.pop();
-      continue;
-    }
-    parts.push(part);
-  }
+  if (typeof input !== 'string' || input.length === 0) return null;
+  if (CONTROL_CHARS.test(input)) return null;
+
+  const decoded = decodePath(input);
+  if (!decoded.ok || typeof decoded.value !== 'string') return null;
+
+  const normalizedUnicode = decoded.value.normalize('NFC');
+  if (CONTROL_CHARS.test(normalizedUnicode)) return null;
+  if (normalizedUnicode.startsWith('/') || WINDOWS_DRIVE_PREFIX.test(normalizedUnicode)) return null;
+
+  const slashNormalized = normalizedUnicode.replace(/\\/g, '/');
+  if (slashNormalized.startsWith('/') || slashNormalized.includes('//')) return null;
+
+  const parts = slashNormalized.split('/');
+  if (parts.some((part) => part === '' || part === '.' || part === '..')) return null;
+
   return parts.join('/');
 }
 
