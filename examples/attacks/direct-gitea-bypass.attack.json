@@ -1,0 +1,7 @@
+{
+  "attack_id": "direct-gitea-bypass",
+  "description": "Attempts to call Gitea directly instead of the SP gateway. Runtime network policy must prevent agent reachability to native Gitea endpoints.",
+  "candidate_endpoint": "http://gitea.internal/api/v1/repos/SocioProphet/example",
+  "expected_result": "blocked",
+  "expected_event_type": "git.op.blocked"
+}
