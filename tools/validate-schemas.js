@@ -24,12 +24,15 @@ const REQUIRED_FILES = [
   'core/nonce-store.js',
   'core/local-authority.js',
   'core/audit-chain.js',
+  'deploy/local/docker-compose.yml',
   'test/control-boundary.test.js',
   'test/local-core.test.js',
+  'test/local-substrate.test.js',
   'docs/authority-boundaries.md',
   'docs/transport-boundary.md',
   'docs/threat-model.md',
   'docs/backlog.md',
+  'docs/local-substrate-topology.md',
   'docs/adr/0001-authority-boundaries.md',
   'docs/adr/0002-token-gateway-vs-native-gitea-token.md',
   'docs/adr/0003-audit-chain-and-export.md',
@@ -177,6 +180,20 @@ for (const phrase of ['issueLocalGrant', 'verifyLocalGrant', 'revokeLocalGrant',
 const audit = fs.existsSync(path.join(ROOT, 'core/audit-chain.js')) ? readText('core/audit-chain.js') : '';
 for (const phrase of ['AuditChain', 'append', 'verify', 'ZERO_HASH']) {
   if (!audit.includes(phrase)) fail(`audit chain core must include: ${phrase}`);
+}
+
+const compose = fs.existsSync(path.join(ROOT, 'deploy/local/docker-compose.yml')) ? readText('deploy/local/docker-compose.yml') : '';
+if (!compose.includes('gitea/gitea:1.26.2-rootless')) fail('local compose must pin gitea/gitea:1.26.2-rootless');
+if (/^\s*ports:/m.test(compose)) fail('local compose must not publish native Gitea host ports');
+if (!/^\s*expose:/m.test(compose)) fail('local compose must expose only to internal network');
+if (!compose.includes('internal: true')) fail('local compose network must be internal-only');
+if (!compose.includes('GITEA__server__DISABLE_SSH: "true"')) fail('local compose must disable ssh');
+if (!compose.includes('GITEA__server__START_SSH_SERVER: "false"')) fail('local compose must not start ssh server');
+if (/PASSWORD|TOKEN|SECRET/i.test(compose)) fail('local compose must not contain credential literals');
+
+const topology = fs.existsSync(path.join(ROOT, 'docs/local-substrate-topology.md')) ? readText('docs/local-substrate-topology.md').toLowerCase() : '';
+for (const phrase of ['1.26.2-rootless', 'internal-only', 'no native gitea token creation', 'no production deployment']) {
+  if (!topology.includes(phrase)) fail(`local topology doc must mention: ${phrase}`);
 }
 
 const transport = fs.existsSync(path.join(ROOT, 'docs/transport-boundary.md')) ? readText('docs/transport-boundary.md').toLowerCase() : '';
