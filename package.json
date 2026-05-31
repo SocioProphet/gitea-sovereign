@@ -1,0 +1,15 @@
+{
+  "name": "@socioprophet/gitea-sovereign",
+  "version": "0.1.0-pr-a",
+  "private": true,
+  "description": "L0 sovereign source-control substrate scaffold for SocioProphet.",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "validate": "node tools/validate-schemas.js",
+    "smoke": "bash scripts/smoke-test.sh"
+  },
+  "license": "MIT"
+}

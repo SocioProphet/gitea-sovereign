@@ -1,0 +1,7 @@
+{
+  "attack_id": "scope-widening",
+  "description": "Attempts to perform an operation outside the signed token scope, such as pr-merge when only read/commit/pr-open are granted.",
+  "candidate_op": "pr-merge",
+  "expected_result": "blocked",
+  "expected_event_type": "scope.exceeded"
+}

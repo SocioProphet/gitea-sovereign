@@ -1,0 +1,6 @@
+{
+  "attack_id": "mutated-intent",
+  "description": "Changes an approved intent payload after token issue. Runtime must compare canonical RFC 8785 intent hash and block divergence.",
+  "expected_result": "blocked",
+  "expected_event_type": "intent.divergence"
+}

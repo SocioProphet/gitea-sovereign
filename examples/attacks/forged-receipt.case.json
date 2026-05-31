@@ -1,0 +1,6 @@
+{
+  "case_id": "forged-receipt",
+  "description": "Receipt hash does not match the exported audit batch. Export consumer must reject the batch and preserve local retry state.",
+  "expected_result": "blocked",
+  "expected_event_type": "git.op.blocked"
+}

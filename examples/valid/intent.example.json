@@ -1,0 +1,26 @@
+{
+  "intent_id": "44444444-4444-4444-8444-444444444444",
+  "agent_id": "33333333-3333-4333-8333-333333333333",
+  "session_id": "22222222-2222-4222-8222-222222222222",
+  "registered_at": 1800000000,
+  "policy_decision_ref": "policy-fabric://decisions/source-control/example",
+  "grant_ref": "mcp-a2a://grants/source-control/example",
+  "operations": [
+    {
+      "op": "commit",
+      "repo": "SocioProphet/example",
+      "branch": "work/pr-a-scaffold-v1",
+      "base_ref": "main",
+      "expected_head": "43d1153c9e50b66704e11dd26f3cee4e23ccc4ea",
+      "paths_allow": ["docs/**", "schemas/**", "tools/**"],
+      "paths_deny": [".env", "node_modules/**", "dist/**"],
+      "branch_protection": "require-pr",
+      "operation_order": 0,
+      "description": "Create non-mutating PR-A scaffold",
+      "evidence_output_path": "artifacts/source-control/pr-a/intent-receipt.json"
+    }
+  ],
+  "user_approved": true,
+  "approved_at": 1800000001,
+  "replay_allowed": false
+}

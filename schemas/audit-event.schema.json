@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://schemas.socioprophet.org/gitea-sovereign/audit-event.schema.json",
+  "title": "AuditEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "seq",
+    "event_id",
+    "event_type",
+    "node_id",
+    "agent_id",
+    "session_id",
+    "wall_time",
+    "monotonic_counter",
+    "prev_event_hash",
+    "event_hash",
+    "key_id",
+    "signature"
+  ],
+  "properties": {
+    "seq": { "type": "integer", "minimum": 0 },
+    "event_id": { "type": "string", "format": "uuid" },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "token.issue",
+        "token.refresh",
+        "token.revoke",
+        "intent.register",
+        "intent.approve",
+        "intent.divergence",
+        "git.op",
+        "git.op.blocked",
+        "agent.register",
+        "agent.suspend",
+        "agent.revoke",
+        "replay.detected",
+        "scope.exceeded",
+        "device.mismatch"
+      ]
+    },
+    "node_id": { "type": "string", "minLength": 1 },
+    "agent_id": { "type": "string", "minLength": 1 },
+    "session_id": { "type": "string", "minLength": 1 },
+    "intent_id": { "type": "string", "minLength": 1 },
+    "token_id": { "type": "string", "minLength": 1 },
+    "policy_decision_ref": { "type": "string", "minLength": 1 },
+    "grant_ref": { "type": "string", "minLength": 1 },
+    "subject_repo": { "type": "string", "minLength": 1 },
+    "subject_ref": { "type": "string", "minLength": 1 },
+    "operation_digest": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" },
+    "receipt_hash": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" },
+    "prev_event_hash": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" },
+    "event_hash": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" },
+    "key_id": { "type": "string", "minLength": 1 },
+    "signature": { "type": "string", "minLength": 16 },
+    "wall_time": { "type": "string", "format": "date-time" },
+    "monotonic_counter": { "type": "integer", "minimum": 0 },
+    "export_cursor": { "type": "integer", "minimum": 0 }
+  }
+}
