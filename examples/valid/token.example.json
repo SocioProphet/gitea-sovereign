@@ -1,0 +1,26 @@
+{
+  "token_id": "11111111-1111-4111-8111-111111111111",
+  "session_id": "22222222-2222-4222-8222-222222222222",
+  "agent_id": "33333333-3333-4333-8333-333333333333",
+  "issuer_node": "org-primary",
+  "aud": "gitea-sovereign",
+  "issued_at": 1800000000,
+  "not_before": 1800000000,
+  "expires_at": 1800000900,
+  "scope": {
+    "repos": ["SocioProphet/example"],
+    "branches": ["work/*"],
+    "ops": ["read", "commit", "pr-open"],
+    "paths_allow": ["docs/**", "schemas/**", "tools/**"],
+    "paths_deny": [".env", "**/*secret*", "node_modules/**", "dist/**"]
+  },
+  "intent_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "policy_decision_ref": "policy-fabric://decisions/source-control/example",
+  "grant_ref": "mcp-a2a://grants/source-control/example",
+  "device_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "replay_nonce": "nonce-example-0001",
+  "cross_node": false,
+  "key_id": "sp-token-hmac-v1",
+  "alg": "HS256",
+  "signature": "example-signature-placeholder"
+}
