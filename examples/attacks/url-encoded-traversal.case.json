@@ -1,0 +1,7 @@
+{
+  "case_id": "url-encoded-traversal",
+  "description": "Encoded path segments resolve outside the allowed path set after decoding. Runtime must normalize before allow or deny matching.",
+  "candidate_path": "docs/%2e%2e/.env",
+  "expected_result": "blocked",
+  "expected_event_type": "git.op.blocked"
+}
