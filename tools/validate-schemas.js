@@ -26,17 +26,20 @@ const REQUIRED_FILES = [
   'core/audit-chain.js',
   'core/native-adapter.js',
   'core/reference-resolver.js',
+  'core/receipt-export.js',
   'deploy/local/docker-compose.yml',
   'test/control-boundary.test.js',
   'test/local-core.test.js',
   'test/local-substrate.test.js',
   'test/native-adapter.test.js',
   'test/reference-resolver.test.js',
+  'test/receipt-export.test.js',
   'docs/authority-boundaries.md',
   'docs/transport-boundary.md',
   'docs/threat-model.md',
   'docs/backlog.md',
   'docs/local-substrate-topology.md',
+  'docs/reference-state-mapping.md',
   'docs/adr/0001-authority-boundaries.md',
   'docs/adr/0002-token-gateway-vs-native-gitea-token.md',
   'docs/adr/0003-audit-chain-and-export.md',
@@ -166,7 +169,8 @@ const localCoreFiles = [
   'core/local-authority.js',
   'core/audit-chain.js',
   'core/native-adapter.js',
-  'core/reference-resolver.js'
+  'core/reference-resolver.js',
+  'core/receipt-export.js'
 ];
 for (const rel of localCoreFiles) {
   const body = fs.existsSync(path.join(ROOT, rel)) ? readText(rel) : '';
@@ -197,6 +201,16 @@ if (/raw_material|native_token|access_token/i.test(nativeAdapter)) fail('native 
 const resolver = fs.existsSync(path.join(ROOT, 'core/reference-resolver.js')) ? readText('core/reference-resolver.js') : '';
 for (const phrase of ['parseReference', 'resolveReference', 'resolvePair', 'decisionReceipt']) {
   if (!resolver.includes(phrase)) fail(`reference resolver scaffold must include: ${phrase}`);
+}
+
+const receiptExport = fs.existsSync(path.join(ROOT, 'core/receipt-export.js')) ? readText('core/receipt-export.js') : '';
+for (const phrase of ['buildExportBatch', 'verifyExportBatch', 'acknowledgeExportBatch', 'classifyExport', 'nextExportRange']) {
+  if (!receiptExport.includes(phrase)) fail(`receipt export scaffold must include: ${phrase}`);
+}
+
+const mapping = fs.existsSync(path.join(ROOT, 'docs/reference-state-mapping.md')) ? readText('docs/reference-state-mapping.md').toLowerCase() : '';
+for (const phrase of ['ok', 'block', 'stale', 'unknown', 'local state']) {
+  if (!mapping.includes(phrase)) fail(`reference state mapping doc must mention: ${phrase}`);
 }
 
 const compose = fs.existsSync(path.join(ROOT, 'deploy/local/docker-compose.yml')) ? readText('deploy/local/docker-compose.yml') : '';
