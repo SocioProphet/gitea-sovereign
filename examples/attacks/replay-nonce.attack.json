@@ -1,0 +1,6 @@
+{
+  "attack_id": "replay-nonce",
+  "description": "Reuses a previously consumed replay_nonce. Runtime gateway must emit replay.detected and revoke the session.",
+  "expected_result": "blocked",
+  "expected_event_type": "replay.detected"
+}
