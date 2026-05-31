@@ -1,0 +1,6 @@
+{
+  "case_id": "stale-base-ref",
+  "description": "Approved intent references an older base_ref that no longer matches repository state. Runtime must fail closed and require a new intent.",
+  "expected_result": "blocked",
+  "expected_event_type": "git.op.blocked"
+}
