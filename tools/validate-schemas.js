@@ -25,11 +25,13 @@ const REQUIRED_FILES = [
   'core/local-authority.js',
   'core/audit-chain.js',
   'core/native-adapter.js',
+  'core/reference-resolver.js',
   'deploy/local/docker-compose.yml',
   'test/control-boundary.test.js',
   'test/local-core.test.js',
   'test/local-substrate.test.js',
   'test/native-adapter.test.js',
+  'test/reference-resolver.test.js',
   'docs/authority-boundaries.md',
   'docs/transport-boundary.md',
   'docs/threat-model.md',
@@ -163,7 +165,8 @@ const localCoreFiles = [
   'core/nonce-store.js',
   'core/local-authority.js',
   'core/audit-chain.js',
-  'core/native-adapter.js'
+  'core/native-adapter.js',
+  'core/reference-resolver.js'
 ];
 for (const rel of localCoreFiles) {
   const body = fs.existsSync(path.join(ROOT, rel)) ? readText(rel) : '';
@@ -190,6 +193,11 @@ for (const phrase of ['issueNativeReceipt', 'revokeNativeReceipt', 'materialDige
   if (!nativeAdapter.includes(phrase)) fail(`native adapter scaffold must include: ${phrase}`);
 }
 if (/raw_material|native_token|access_token/i.test(nativeAdapter)) fail('native adapter scaffold must not expose raw/native token field names');
+
+const resolver = fs.existsSync(path.join(ROOT, 'core/reference-resolver.js')) ? readText('core/reference-resolver.js') : '';
+for (const phrase of ['parseReference', 'resolveReference', 'resolvePair', 'decisionReceipt']) {
+  if (!resolver.includes(phrase)) fail(`reference resolver scaffold must include: ${phrase}`);
+}
 
 const compose = fs.existsSync(path.join(ROOT, 'deploy/local/docker-compose.yml')) ? readText('deploy/local/docker-compose.yml') : '';
 if (!compose.includes('gitea/gitea:1.26.2-rootless')) fail('local compose must pin gitea/gitea:1.26.2-rootless');
