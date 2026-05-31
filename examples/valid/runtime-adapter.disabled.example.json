@@ -1,0 +1,26 @@
+{
+  "adapter_status": "design-only",
+  "runtime_binding_enabled": false,
+  "config_ref": "examples/valid/runtime-config.disabled.example.json",
+  "contract_ref": "docs/runtime-adapter-contract.md",
+  "allowed_outputs": [
+    "operation_status",
+    "operation_digest",
+    "receipt_hash",
+    "audit_event_ref",
+    "failure_reason"
+  ],
+  "forbidden_outputs": [
+    "raw_material",
+    "native_token",
+    "access_token",
+    "password",
+    "secret"
+  ],
+  "required_fail_closed_cases": [
+    "service_unavailable",
+    "rejected_response",
+    "stale_reference",
+    "malformed_operation"
+  ]
+}
