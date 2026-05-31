@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * PR-A validator scaffold.
+ * Scaffold validator.
  * This intentionally performs deterministic local checks only.
  * Runtime token issuance, native Gitea calls, and network validation are out of scope.
  */
@@ -18,6 +18,9 @@ const REQUIRED_FILES = [
   'schemas/audit-event.schema.json',
   'schemas/agent-registration.schema.json',
   'schemas/receipt-export.schema.json',
+  'schemas/control-config.schema.json',
+  'gateway/control-boundary.js',
+  'test/control-boundary.test.js',
   'docs/authority-boundaries.md',
   'docs/transport-boundary.md',
   'docs/threat-model.md',
@@ -85,6 +88,20 @@ for (const rel of REQUIRED_FILES.filter((f) => f.endsWith('.json') && f.startsWi
   readJson(rel);
 }
 
+const packageJson = readJson('package.json');
+if (packageJson) {
+  if (!packageJson.scripts?.check) fail('package.json must define scripts.check');
+  if (!packageJson.scripts?.validate) fail('package.json must define scripts.validate');
+}
+
+const controlConfig = readJson('schemas/control-config.schema.json');
+if (controlConfig) {
+  for (const key of ['node_id', 'audience', 'mode', 'policy', 'grants', 'path_policy']) {
+    if (!controlConfig.properties[key]) fail(`control config schema must include ${key}`);
+  }
+  if (controlConfig.properties.mode.enum.includes('runtime') !== true) fail('control config must reserve runtime mode');
+}
+
 const token = readJson('schemas/token.schema.json');
 if (token) {
   const props = token.properties || {};
@@ -125,6 +142,12 @@ if (receipt) {
   if (receipt.properties.ack_required.const !== true) fail('receipt export ack_required must be const true');
 }
 
+const controlBoundary = fs.existsSync(path.join(ROOT, 'gateway/control-boundary.js')) ? readText('gateway/control-boundary.js') : '';
+for (const phrase of ['module.exports', 'normalizePath', 'evaluatePath', 'evaluateRequest', 'makeResolver']) {
+  if (!controlBoundary.includes(phrase)) fail(`control boundary must include: ${phrase}`);
+}
+if (/fetch\s*\(|http\.|https\.|net\.|tls\./.test(controlBoundary)) fail('control boundary must not perform network operations in PR-B');
+
 const transport = fs.existsSync(path.join(ROOT, 'docs/transport-boundary.md')) ? readText('docs/transport-boundary.md').toLowerCase() : '';
 for (const phrase of ['api-mediated writes', 'ssh git is disabled', 'smart http git is disabled', 'toctou']) {
   if (!transport.includes(phrase)) fail(`transport boundary must mention: ${phrase}`);
@@ -140,4 +163,4 @@ if (failures > 0) {
   process.exit(1);
 }
 
-console.log('\nPR-A scaffold validation passed. Runtime behavior remains intentionally disabled.');
+console.log('\nScaffold validation passed. Runtime behavior remains intentionally disabled.');
