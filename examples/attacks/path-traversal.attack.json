@@ -1,0 +1,7 @@
+{
+  "attack_id": "path-traversal",
+  "description": "Attempts to write outside an allowed path using ../ traversal. Runtime gateway must normalize and block before native Gitea forwarding.",
+  "candidate_path": "docs/../.env",
+  "expected_result": "blocked",
+  "expected_event_type": "git.op.blocked"
+}
