@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://schemas.socioprophet.org/gitea-sovereign/runtime-config.schema.json",
+  "title": "RuntimeBindingConfig",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "runtime_mode",
+    "local_scaffold_default",
+    "bindings",
+    "guards"
+  ],
+  "properties": {
+    "runtime_mode": {
+      "type": "string",
+      "enum": ["disabled", "enabled"],
+      "default": "disabled"
+    },
+    "local_scaffold_default": {
+      "type": "boolean",
+      "const": true
+    },
+    "bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gitea", "upstream_refs", "ledger_export", "git_transport"],
+      "properties": {
+        "gitea": { "$ref": "#/definitions/binding" },
+        "upstream_refs": { "$ref": "#/definitions/binding" },
+        "ledger_export": { "$ref": "#/definitions/binding" },
+        "git_transport": { "$ref": "#/definitions/transportBinding" }
+      }
+    },
+    "guards": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fail_closed_dependencies",
+        "audit_chain_required",
+        "evidence_required",
+        "negative_tests_required",
+        "raw_material_logging_forbidden"
+      ],
+      "properties": {
+        "fail_closed_dependencies": { "type": "boolean", "const": true },
+        "audit_chain_required": { "type": "boolean", "const": true },
+        "evidence_required": { "type": "boolean", "const": true },
+        "negative_tests_required": { "type": "boolean", "const": true },
+        "raw_material_logging_forbidden": { "type": "boolean", "const": true }
+      }
+    }
+  },
+  "definitions": {
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "mode", "dependency_ref"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "mode": { "type": "string", "enum": ["local-only", "runtime"] },
+        "dependency_ref": { "type": "string", "minLength": 1 }
+      }
+    },
+    "transportBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "mode", "dependency_ref", "enforcement_design_ref"],
+      "properties": {
+        "enabled": { "type": "boolean", "const": false },
+        "mode": { "type": "string", "const": "disabled" },
+        "dependency_ref": { "type": "string", "minLength": 1 },
+        "enforcement_design_ref": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
