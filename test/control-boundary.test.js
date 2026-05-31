@@ -10,12 +10,24 @@ const {
 } = require('../gateway/control-boundary');
 
 test('normalizes ordinary paths', () => {
-  assert.equal(normalizePath('docs/./architecture.md'), 'docs/architecture.md');
-  assert.equal(normalizePath('docs/%2e/architecture.md'), 'docs/architecture.md');
+  assert.equal(normalizePath('docs/architecture.md'), 'docs/architecture.md');
+  assert.equal(normalizePath('docs/subdir/file.md'), 'docs/subdir/file.md');
 });
 
-test('rejects traversal beyond root', () => {
+test('rejects dot and traversal segments instead of resolving them', () => {
+  assert.equal(normalizePath('docs/./architecture.md'), null);
   assert.equal(normalizePath('../outside'), null);
+  assert.equal(normalizePath('docs/../outside'), null);
+  assert.equal(normalizePath('docs/%2e/architecture.md'), null);
+  assert.equal(normalizePath('docs/%2e%2e/outside'), null);
+});
+
+test('rejects malformed encoding and absolute path forms', () => {
+  assert.equal(normalizePath('docs/%zz/file.md'), null);
+  assert.equal(normalizePath('/docs/file.md'), null);
+  assert.equal(normalizePath('C:\\docs\\file.md'), null);
+  assert.equal(normalizePath('docs//file.md'), null);
+  assert.equal(normalizePath('docs/fi\u0000le.md'), null);
 });
 
 test('deny wins over allow', () => {
