@@ -2,7 +2,7 @@
 /*
  * Scaffold validator.
  * This intentionally performs deterministic local checks only.
- * Runtime token issuance, native Gitea calls, and network validation are out of scope.
+ * Runtime native Gitea calls, external service calls, and network validation are out of scope.
  */
 
 const fs = require('fs');
@@ -20,7 +20,12 @@ const REQUIRED_FILES = [
   'schemas/receipt-export.schema.json',
   'schemas/control-config.schema.json',
   'gateway/control-boundary.js',
+  'core/canonical.js',
+  'core/nonce-store.js',
+  'core/local-authority.js',
+  'core/audit-chain.js',
   'test/control-boundary.test.js',
+  'test/local-core.test.js',
   'docs/authority-boundaries.md',
   'docs/transport-boundary.md',
   'docs/threat-model.md',
@@ -146,7 +151,33 @@ const controlBoundary = fs.existsSync(path.join(ROOT, 'gateway/control-boundary.
 for (const phrase of ['module.exports', 'normalizePath', 'evaluatePath', 'evaluateRequest', 'makeResolver']) {
   if (!controlBoundary.includes(phrase)) fail(`control boundary must include: ${phrase}`);
 }
-if (/fetch\s*\(|http\.|https\.|net\.|tls\./.test(controlBoundary)) fail('control boundary must not perform network operations in PR-B');
+
+const localCoreFiles = [
+  'gateway/control-boundary.js',
+  'core/canonical.js',
+  'core/nonce-store.js',
+  'core/local-authority.js',
+  'core/audit-chain.js'
+];
+for (const rel of localCoreFiles) {
+  const body = fs.existsSync(path.join(ROOT, rel)) ? readText(rel) : '';
+  if (/fetch\s*\(|http\.|https\.|net\.|tls\./.test(body)) fail(`${rel} must not perform network operations in local scaffold`);
+}
+
+const canonical = fs.existsSync(path.join(ROOT, 'core/canonical.js')) ? readText('core/canonical.js') : '';
+for (const phrase of ['canonicalize', 'sha256Hex', 'hmacSha256Hex', 'stableHash']) {
+  if (!canonical.includes(phrase)) fail(`canonical helper must include: ${phrase}`);
+}
+
+const localAuthority = fs.existsSync(path.join(ROOT, 'core/local-authority.js')) ? readText('core/local-authority.js') : '';
+for (const phrase of ['issueLocalGrant', 'verifyLocalGrant', 'revokeLocalGrant', 'DEFAULT_TTL_SECONDS']) {
+  if (!localAuthority.includes(phrase)) fail(`local authority core must include: ${phrase}`);
+}
+
+const audit = fs.existsSync(path.join(ROOT, 'core/audit-chain.js')) ? readText('core/audit-chain.js') : '';
+for (const phrase of ['AuditChain', 'append', 'verify', 'ZERO_HASH']) {
+  if (!audit.includes(phrase)) fail(`audit chain core must include: ${phrase}`);
+}
 
 const transport = fs.existsSync(path.join(ROOT, 'docs/transport-boundary.md')) ? readText('docs/transport-boundary.md').toLowerCase() : '';
 for (const phrase of ['api-mediated writes', 'ssh git is disabled', 'smart http git is disabled', 'toctou']) {
