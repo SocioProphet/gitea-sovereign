@@ -1,0 +1,6 @@
+{
+  "case_id": "reordered-audit-seq",
+  "description": "Audit rows are presented out of sequence. Chain verification must reject gaps, reordering, and prev_event_hash mismatch.",
+  "expected_result": "blocked",
+  "expected_event_type": "git.op.blocked"
+}
