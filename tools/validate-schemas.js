@@ -40,6 +40,7 @@ const REQUIRED_FILES = [
   'test/runtime-config.test.js',
   'test/runtime-adapter-contract.test.js',
   'test/upstream-reference-binding-contract.test.js',
+  'test/ledger-export-binding-contract.test.js',
   'docs/authority-boundaries.md',
   'docs/transport-boundary.md',
   'docs/threat-model.md',
@@ -51,6 +52,7 @@ const REQUIRED_FILES = [
   'docs/path-boundary.md',
   'docs/runtime-adapter-contract.md',
   'docs/upstream-reference-binding-contract.md',
+  'docs/ledger-export-binding-contract.md',
   'docs/adr/0001-authority-boundaries.md',
   'docs/adr/0002-token-gateway-vs-native-gitea-token.md',
   'docs/adr/0003-audit-chain-and-export.md',
@@ -62,6 +64,7 @@ const REQUIRED_FILES = [
   'examples/valid/runtime-config.disabled.example.json',
   'examples/valid/runtime-adapter.disabled.example.json',
   'examples/valid/upstream-reference-binding.disabled.example.json',
+  'examples/valid/ledger-export-binding.disabled.example.json',
   'examples/attacks/replay-nonce.attack.json',
   'examples/attacks/path-traversal.attack.json',
   'examples/attacks/direct-gitea-bypass.attack.json',
@@ -186,6 +189,19 @@ if (upstreamDisabled) {
     if (!upstreamDisabled.fail_closed_cases.includes(item)) fail(`upstream binding fixture must require fail-closed case: ${item}`);
   }
   if (upstreamDisabled.write_unknown_behavior !== 'stop') fail('upstream binding fixture must stop write-class unknown outcomes');
+}
+
+const ledgerDisabled = readJson('examples/valid/ledger-export-binding.disabled.example.json');
+if (ledgerDisabled) {
+  if (ledgerDisabled.binding_status !== 'planning-only') fail('ledger export binding fixture must remain planning-only');
+  if (ledgerDisabled.runtime_binding_enabled !== false) fail('ledger export binding fixture must keep binding disabled');
+  if (ledgerDisabled.consumer_issue_ref !== 'SocioProphet/model-governance-ledger#24') fail('ledger export binding fixture must track consumer issue #24');
+  if (ledgerDisabled.producer_role !== 'source-control-receipt-producer') fail('ledger export binding fixture must preserve producer role');
+  if (ledgerDisabled.consumer_role !== 'canonical-evidence-receipt-consumer') fail('ledger export binding fixture must preserve consumer role');
+  if (ledgerDisabled.audit_before_export_required !== true) fail('ledger export binding fixture must require audit before export');
+  for (const item of ['missing_consumer_contract', 'dependency_unavailable', 'timeout', 'malformed_acknowledgement', 'acknowledgement_hash_mismatch', 'unsupported_consumer_version', 'sequence_gap', 'audit_chain_verification_failure', 'duplicate_batch_rejection']) {
+    if (!ledgerDisabled.fail_closed_cases.includes(item)) fail(`ledger export binding fixture must require fail-closed case: ${item}`);
+  }
 }
 
 const token = readJson('schemas/token.schema.json');
@@ -318,6 +334,11 @@ for (const phrase of ['design scaffold only', 'does not enable runtime behavior'
 const upstreamContract = fs.existsSync(path.join(ROOT, 'docs/upstream-reference-binding-contract.md')) ? readText('docs/upstream-reference-binding-contract.md').toLowerCase() : '';
 for (const phrase of ['planning scaffold only', 'policy fabric', 'mcp/a2a zero trust', 'write-class operations must stop on `unknown`']) {
   if (!upstreamContract.includes(phrase)) fail(`upstream reference binding contract must mention: ${phrase}`);
+}
+
+const ledgerContract = fs.existsSync(path.join(ROOT, 'docs/ledger-export-binding-contract.md')) ? readText('docs/ledger-export-binding-contract.md').toLowerCase() : '';
+for (const phrase of ['planning scaffold only', 'model-governance-ledger', 'audit log -> export cursor -> model-governance-ledger', 'audit-chain verification must pass before export batch construction']) {
+  if (!ledgerContract.includes(phrase)) fail(`ledger export binding contract must mention: ${phrase}`);
 }
 
 const compose = fs.existsSync(path.join(ROOT, 'deploy/local/docker-compose.yml')) ? readText('deploy/local/docker-compose.yml') : '';
