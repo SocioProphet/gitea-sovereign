@@ -1,0 +1,39 @@
+{
+  "capability_id": "cap.demo.clean-merge.001",
+  "schema_version": "0.1.0",
+  "agent_id": "agent.gitops.pr-janitor.v1",
+  "task_id": "task.demo.clean-merge.001",
+  "grant_decision_ref": "mcp-a2a:grant:demo-clean-merge-001",
+  "policy_decision_ref": "policy-fabric:decision:demo-clean-merge-001",
+  "operation": "forge.pull_request.merge",
+  "repository": {
+    "forge": "gitea",
+    "owner": "SocioProphet",
+    "name": "demo-repo",
+    "node_id": "node.local.dev",
+    "url": "https://gitea.local/SocioProphet/demo-repo"
+  },
+  "object_type": "pull_request",
+  "object_id": "42",
+  "constraints": {
+    "freshness_seconds": 300,
+    "expected_head": "a1b2c3d4",
+    "expected_base": "main",
+    "allowed_pull_request": "42",
+    "protected_path_policy": "requires_human_review",
+    "require_checks_success": true,
+    "require_review_clearance": true,
+    "require_receipt": true,
+    "require_reconciliation": true,
+    "allow_destructive_action": false
+  },
+  "issued_at": "2026-06-01T11:59:00Z",
+  "expires_at": "2026-06-01T12:04:00Z",
+  "max_uses": 1,
+  "uses_remaining": 1,
+  "status": "issued",
+  "metadata": {
+    "example": true,
+    "purpose": "valid least-privilege capability grant for clean pull request merge"
+  }
+}
