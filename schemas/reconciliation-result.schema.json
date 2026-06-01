@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/gitea-sovereign/reconciliation-result.schema.json",
+  "title": "ReconciliationResult",
+  "description": "Post-action source-of-truth reconciliation result. This is the completion gate paired with a provider receipt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reconciliation_result_id",
+    "schema_version",
+    "receipt_id",
+    "repository",
+    "object_type",
+    "object_id",
+    "expected_state",
+    "observed_state",
+    "source_of_truth_read_timestamp",
+    "source_of_truth_object_version",
+    "classification",
+    "reason"
+  ],
+  "properties": {
+    "reconciliation_result_id": {
+      "type": "string",
+      "pattern": "^gitea-sovereign:reconciliation:[A-Za-z0-9._:-]+$"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "receipt_id": {
+      "type": "string",
+      "pattern": "^gitea-sovereign:receipt:[A-Za-z0-9._:-]+$"
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["forge", "owner", "name"],
+      "properties": {
+        "forge": {
+          "type": "string",
+          "enum": ["gitea", "github", "forgejo", "gitlab"]
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "object_type": {
+      "type": "string",
+      "enum": ["repository", "pull_request", "branch", "commit", "check", "issue", "label", "comment", "release"]
+    },
+    "object_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "expected_state": {
+      "$ref": "#/$defs/state_observation"
+    },
+    "observed_state": {
+      "$ref": "#/$defs/state_observation"
+    },
+    "source_of_truth_read_timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_of_truth_object_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "classification": {
+      "type": "string",
+      "enum": [
+        "verified_success",
+        "verified_noop",
+        "verified_rejected",
+        "reconciliation_failed",
+        "ambiguous_mutation_state",
+        "divergent_state",
+        "requires_human_review"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "svf_receipt_ref": {
+      "type": "string",
+      "pattern": "^svf:receipt:[A-Za-z0-9._:-]+$"
+    },
+    "receipt_export_cursor": {
+      "type": "string"
+    },
+    "followup_required": {
+      "type": "boolean"
+    },
+    "followup_reason": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number", "integer", "boolean", "null"]
+      }
+    }
+  },
+  "$defs": {
+    "state_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state_digest", "facts"],
+      "properties": {
+        "state_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "facts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "number", "integer", "boolean", "null"]
+          }
+        }
+      }
+    },
+    "digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "value"],
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "enum": ["sha256", "sha512", "blake3"]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 32
+        }
+      }
+    }
+  }
+}
