@@ -1,9 +1,12 @@
-.PHONY: validate validate-schemas check smoke-test bootstrap-org bootstrap-node
+.PHONY: validate validate-schemas validate-examples check smoke-test bootstrap-org bootstrap-node
 
-validate: validate-schemas check smoke-test
+validate: validate-schemas validate-examples check smoke-test
 
 validate-schemas:
 	node tools/validate-schemas.js
+
+validate-examples:
+	python3 tools/validate_examples.py
 
 check:
 	npm run check
