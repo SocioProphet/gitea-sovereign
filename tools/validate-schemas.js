@@ -41,6 +41,7 @@ const REQUIRED_FILES = [
   'test/runtime-adapter-contract.test.js',
   'test/upstream-reference-binding-contract.test.js',
   'test/ledger-export-binding-contract.test.js',
+  'test/local-runtime-demo-plan.test.js',
   'docs/authority-boundaries.md',
   'docs/transport-boundary.md',
   'docs/threat-model.md',
@@ -53,6 +54,7 @@ const REQUIRED_FILES = [
   'docs/runtime-adapter-contract.md',
   'docs/upstream-reference-binding-contract.md',
   'docs/ledger-export-binding-contract.md',
+  'docs/local-runtime-demo-plan.md',
   'docs/adr/0001-authority-boundaries.md',
   'docs/adr/0002-token-gateway-vs-native-gitea-token.md',
   'docs/adr/0003-audit-chain-and-export.md',
@@ -65,6 +67,7 @@ const REQUIRED_FILES = [
   'examples/valid/runtime-adapter.disabled.example.json',
   'examples/valid/upstream-reference-binding.disabled.example.json',
   'examples/valid/ledger-export-binding.disabled.example.json',
+  'examples/valid/local-runtime-demo.disabled.example.json',
   'examples/attacks/replay-nonce.attack.json',
   'examples/attacks/path-traversal.attack.json',
   'examples/attacks/direct-gitea-bypass.attack.json',
@@ -204,6 +207,21 @@ if (ledgerDisabled) {
   }
 }
 
+const localRuntimeDemo = readJson('examples/valid/local-runtime-demo.disabled.example.json');
+if (localRuntimeDemo) {
+  if (localRuntimeDemo.demo_status !== 'planning-only') fail('local runtime demo fixture must remain planning-only');
+  if (localRuntimeDemo.runtime_demo_enabled !== false) fail('local runtime demo fixture must keep demo disabled');
+  for (const blocker of ['runtime_config_schema', 'runtime_adapter_contract', 'upstream_reference_binding_contract', 'ledger_export_binding_contract', 'model_governance_ledger_consumer_contract', 'git_transport_disabled_or_enforced', 'audit_before_export', 'local_scaffold_fallback']) {
+    if (!localRuntimeDemo.required_blockers.includes(blocker)) fail(`local runtime demo fixture must require blocker: ${blocker}`);
+  }
+  for (const behavior of ['refuse_runtime_execution', 'preserve_local_mvp_demo', 'avoid_live_bindings', 'return_fail_closed_reason', 'no_infrastructure_mutation']) {
+    if (!localRuntimeDemo.disabled_behavior.includes(behavior)) fail(`local runtime demo fixture must require disabled behavior: ${behavior}`);
+  }
+  for (const field of ['runtime_mode', 'request_digest', 'path_decision', 'reference_decision', 'grant_verification', 'request_coverage_decision', 'adapter_operation_status', 'audit_verification', 'export_batch_hash', 'acknowledgement_hash', 'failure_reason']) {
+    if (!localRuntimeDemo.required_evidence_fields.includes(field)) fail(`local runtime demo fixture must require evidence field: ${field}`);
+  }
+}
+
 const token = readJson('schemas/token.schema.json');
 if (token) {
   const props = token.properties || {};
@@ -339,6 +357,11 @@ for (const phrase of ['planning scaffold only', 'policy fabric', 'mcp/a2a zero t
 const ledgerContract = fs.existsSync(path.join(ROOT, 'docs/ledger-export-binding-contract.md')) ? readText('docs/ledger-export-binding-contract.md').toLowerCase() : '';
 for (const phrase of ['planning scaffold only', 'model-governance-ledger', 'audit log -> export cursor -> model-governance-ledger', 'audit-chain verification must pass before export batch construction']) {
   if (!ledgerContract.includes(phrase)) fail(`ledger export binding contract must mention: ${phrase}`);
+}
+
+const localRuntimeDemoPlan = fs.existsSync(path.join(ROOT, 'docs/local-runtime-demo-plan.md')) ? readText('docs/local-runtime-demo-plan.md').toLowerCase() : '';
+for (const phrase of ['planning scaffold only', 'runtime demo implementation must not start until', 'when runtime mode is disabled', 'no git transport enablement']) {
+  if (!localRuntimeDemoPlan.includes(phrase)) fail(`local runtime demo plan must mention: ${phrase}`);
 }
 
 const compose = fs.existsSync(path.join(ROOT, 'deploy/local/docker-compose.yml')) ? readText('deploy/local/docker-compose.yml') : '';
