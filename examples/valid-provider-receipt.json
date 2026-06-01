@@ -1,0 +1,40 @@
+{
+  "receipt_id": "gitea-sovereign:receipt:demo-clean-merge-001",
+  "schema_version": "0.1.0",
+  "agent_id": "agent.gitops.pr-janitor.v1",
+  "task_id": "task.demo.clean-merge.001",
+  "capability_id": "cap.demo.clean-merge.001",
+  "grant_decision_ref": "mcp-a2a:grant:demo-clean-merge-001",
+  "policy_decision_ref": "policy-fabric:decision:demo-clean-merge-001",
+  "operation": "forge.pull_request.merge",
+  "repository": {
+    "forge": "gitea",
+    "owner": "SocioProphet",
+    "name": "demo-repo",
+    "node_id": "node.local.dev",
+    "url": "https://gitea.local/SocioProphet/demo-repo"
+  },
+  "object_type": "pull_request",
+  "object_id": "42",
+  "before_state_digest": {
+    "algorithm": "sha256",
+    "value": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "preflight_policy_decision": "allow",
+  "execution_result": "success",
+  "provider_request_id": "gitea-request-demo-001",
+  "provider_object_version": "pr-42-head-a1b2c3d4",
+  "commit_sha_or_merge_sha_or_state_marker": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "after_state_digest": {
+    "algorithm": "sha256",
+    "value": "2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "reconciliation_result_id": "gitea-sovereign:reconciliation:demo-clean-merge-001",
+  "svf_receipt_ref": "svf:receipt:demo-clean-merge-001",
+  "receipt_export_cursor": "cursor.demo.000001",
+  "timestamp": "2026-06-01T12:00:00Z",
+  "metadata": {
+    "example": true,
+    "purpose": "valid provider receipt fixture for a clean merge"
+  }
+}
