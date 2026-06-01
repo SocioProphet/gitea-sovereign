@@ -1,0 +1,35 @@
+{
+  "demo_status": "planning-only",
+  "runtime_demo_enabled": false,
+  "contract_ref": "docs/local-runtime-demo-plan.md",
+  "required_blockers": [
+    "runtime_config_schema",
+    "runtime_adapter_contract",
+    "upstream_reference_binding_contract",
+    "ledger_export_binding_contract",
+    "model_governance_ledger_consumer_contract",
+    "git_transport_disabled_or_enforced",
+    "audit_before_export",
+    "local_scaffold_fallback"
+  ],
+  "disabled_behavior": [
+    "refuse_runtime_execution",
+    "preserve_local_mvp_demo",
+    "avoid_live_bindings",
+    "return_fail_closed_reason",
+    "no_infrastructure_mutation"
+  ],
+  "required_evidence_fields": [
+    "runtime_mode",
+    "request_digest",
+    "path_decision",
+    "reference_decision",
+    "grant_verification",
+    "request_coverage_decision",
+    "adapter_operation_status",
+    "audit_verification",
+    "export_batch_hash",
+    "acknowledgement_hash",
+    "failure_reason"
+  ]
+}
