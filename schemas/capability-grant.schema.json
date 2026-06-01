@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/gitea-sovereign/capability-grant.schema.json",
+  "title": "CapabilityGrant",
+  "description": "Task-scoped, expiring, least-privilege capability grant for mediated sovereign forge operations.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "capability_id",
+    "schema_version",
+    "agent_id",
+    "task_id",
+    "grant_decision_ref",
+    "policy_decision_ref",
+    "operation",
+    "repository",
+    "object_type",
+    "object_id",
+    "constraints",
+    "issued_at",
+    "expires_at",
+    "max_uses",
+    "status"
+  ],
+  "properties": {
+    "capability_id": {
+      "type": "string",
+      "pattern": "^cap(?:ability)?[.:][A-Za-z0-9._:-]+$"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "agent_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "grant_decision_ref": {
+      "type": "string",
+      "description": "Reference to the mcp-a2a-zero-trust or equivalent grant decision."
+    },
+    "policy_decision_ref": {
+      "type": "string",
+      "description": "Reference to the PolicyPlane/policy-fabric decision authorizing this capability."
+    },
+    "operation": {
+      "type": "string",
+      "enum": [
+        "forge.repository.read",
+        "forge.pull_request.read",
+        "forge.branch.read",
+        "forge.commit.read",
+        "forge.checks.read",
+        "forge.issue.read",
+        "forge.diff.read",
+        "forge.pull_request.merge",
+        "forge.pull_request.close",
+        "forge.branch.delete",
+        "forge.issue.close",
+        "forge.label.apply",
+        "forge.comment.create",
+        "forge.release.create"
+      ]
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["forge", "owner", "name"],
+      "properties": {
+        "forge": {
+          "type": "string",
+          "enum": ["gitea", "github", "forgejo", "gitlab"]
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "object_type": {
+      "type": "string",
+      "enum": ["repository", "pull_request", "branch", "commit", "check", "issue", "label", "comment", "release"]
+    },
+    "object_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["freshness_seconds", "require_receipt", "require_reconciliation"],
+      "properties": {
+        "freshness_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 900
+        },
+        "expected_head": {
+          "type": "string"
+        },
+        "expected_base": {
+          "type": "string"
+        },
+        "allowed_branch": {
+          "type": "string"
+        },
+        "allowed_pull_request": {
+          "type": "string"
+        },
+        "protected_path_policy": {
+          "type": "string",
+          "enum": ["deny", "requires_human_review", "allow"]
+        },
+        "require_checks_success": {
+          "type": "boolean",
+          "default": true
+        },
+        "require_review_clearance": {
+          "type": "boolean",
+          "default": true
+        },
+        "require_receipt": {
+          "type": "boolean",
+          "const": true
+        },
+        "require_reconciliation": {
+          "type": "boolean",
+          "const": true
+        },
+        "allow_destructive_action": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "max_uses": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "uses_remaining": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10
+    },
+    "status": {
+      "type": "string",
+      "enum": ["issued", "consumed", "expired", "revoked", "rejected"]
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number", "integer", "boolean", "null"]
+      }
+    }
+  }
+}
