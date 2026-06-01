@@ -10,6 +10,7 @@ required=(
   docs/transport-boundary.md
   docs/threat-model.md
   docs/registered-agent-control-plane-integration.md
+  docs/registered-agent-validation-matrix.md
   docs/validation.md
   schemas/token.schema.json
   schemas/intent.schema.json
