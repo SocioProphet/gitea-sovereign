@@ -20,6 +20,9 @@ const REQUIRED_FILES = [
   'schemas/receipt-export.schema.json',
   'schemas/control-config.schema.json',
   'schemas/runtime-config.schema.json',
+  'schemas/capability-grant.schema.json',
+  'schemas/provider-receipt.schema.json',
+  'schemas/reconciliation-result.schema.json',
   'gateway/control-boundary.js',
   'core/canonical.js',
   'core/nonce-store.js',
@@ -55,6 +58,8 @@ const REQUIRED_FILES = [
   'docs/upstream-reference-binding-contract.md',
   'docs/ledger-export-binding-contract.md',
   'docs/local-runtime-demo-plan.md',
+  'docs/registered-agent-control-plane-integration.md',
+  'docs/validation.md',
   'docs/adr/0001-authority-boundaries.md',
   'docs/adr/0002-token-gateway-vs-native-gitea-token.md',
   'docs/adr/0003-audit-chain-and-export.md',
@@ -68,6 +73,12 @@ const REQUIRED_FILES = [
   'examples/valid/upstream-reference-binding.disabled.example.json',
   'examples/valid/ledger-export-binding.disabled.example.json',
   'examples/valid/local-runtime-demo.disabled.example.json',
+  'examples/valid-capability-grant.json',
+  'examples/valid-provider-receipt.json',
+  'examples/valid-reconciliation-result.json',
+  'examples/invalid-capability-missing-reconciliation.json',
+  'examples/invalid-capability-multi-use-write.json',
+  'examples/invalid-false-completion-missing-reconciliation.json',
   'examples/attacks/replay-nonce.attack.json',
   'examples/attacks/path-traversal.attack.json',
   'examples/attacks/direct-gitea-bypass.attack.json',
@@ -262,6 +273,31 @@ if (receipt) {
   if (receipt.properties.ack_required.const !== true) fail('receipt export ack_required must be const true');
 }
 
+const capabilityGrant = readJson('schemas/capability-grant.schema.json');
+if (capabilityGrant) {
+  for (const key of ['capability_id', 'agent_id', 'task_id', 'grant_decision_ref', 'policy_decision_ref', 'operation', 'constraints', 'expires_at', 'max_uses', 'status']) {
+    if (!capabilityGrant.properties[key]) fail(`capability grant schema must include ${key}`);
+  }
+  if (capabilityGrant.properties.constraints.properties.require_receipt.const !== true) fail('capability grant must require receipts');
+  if (capabilityGrant.properties.constraints.properties.require_reconciliation.const !== true) fail('capability grant must require reconciliation');
+}
+
+const providerReceipt = readJson('schemas/provider-receipt.schema.json');
+if (providerReceipt) {
+  for (const key of ['receipt_id', 'capability_id', 'grant_decision_ref', 'policy_decision_ref', 'operation', 'before_state_digest', 'execution_result', 'after_state_digest', 'timestamp']) {
+    if (!providerReceipt.properties[key]) fail(`provider receipt schema must include ${key}`);
+  }
+}
+
+const reconciliationResult = readJson('schemas/reconciliation-result.schema.json');
+if (reconciliationResult) {
+  for (const key of ['reconciliation_result_id', 'receipt_id', 'expected_state', 'observed_state', 'source_of_truth_read_timestamp', 'classification', 'reason']) {
+    if (!reconciliationResult.properties[key]) fail(`reconciliation result schema must include ${key}`);
+  }
+  if (!reconciliationResult.properties.classification.enum.includes('verified_success')) fail('reconciliation result must include verified_success classification');
+  if (!reconciliationResult.properties.classification.enum.includes('ambiguous_mutation_state')) fail('reconciliation result must include ambiguous mutation state classification');
+}
+
 const controlBoundary = fs.existsSync(path.join(ROOT, 'gateway/control-boundary.js')) ? readText('gateway/control-boundary.js') : '';
 for (const phrase of ['module.exports', 'normalizePath', 'evaluatePath', 'evaluateRequest', 'makeResolver']) {
   if (!controlBoundary.includes(phrase)) fail(`control boundary must include: ${phrase}`);
@@ -337,6 +373,11 @@ for (const phrase of ['local mvp demo', 'audit verification must pass before exp
 const pathDoc = fs.existsSync(path.join(ROOT, 'docs/path-boundary.md')) ? readText('docs/path-boundary.md').toLowerCase() : '';
 for (const phrase of ['authorization-path handling must fail closed', 'deny-wins rule', 'changed-path extraction', 'transport-specific enforcement']) {
   if (!pathDoc.includes(phrase)) fail(`path boundary doc must mention: ${phrase}`);
+}
+
+const validationDoc = fs.existsSync(path.join(ROOT, 'docs/validation.md')) ? readText('docs/validation.md').toLowerCase() : '';
+for (const phrase of ['make validate', 'write capabilities must require provider receipts and reconciliation', 'pr-a write capabilities must be single-use', 'providerreceipt', 'reconciliationresult']) {
+  if (!validationDoc.includes(phrase)) fail(`validation doc must mention: ${phrase}`);
 }
 
 const runtimeAdr = fs.existsSync(path.join(ROOT, 'docs/adr/0006-runtime-binding-gates.md')) ? readText('docs/adr/0006-runtime-binding-gates.md').toLowerCase() : '';
