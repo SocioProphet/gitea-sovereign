@@ -6,8 +6,8 @@ This repository is being initialized through the PR-A scaffold. Runtime token is
 
 ## Validation
 
-The PR-A/L0 scaffold includes a standard-library validation script for receipt and reconciliation examples:
+Run the canonical scaffold validation target from the repository root:
 
-    python3 tools/validate_examples.py
+    make validate
 
-See `docs/validation.md` for the validation invariant and current fixture set.
+This target runs schema validation, example invariant validation, tests, and scaffold smoke tests. See `docs/validation.md` for the validation invariant and current fixture set.
