@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.socioprophet.org/gitea-sovereign/provider-receipt.schema.json",
+  "title": "ProviderReceipt",
+  "description": "Receipt emitted by the mediated forge gateway after a provider operation attempt. A receipt is not completion proof until paired with a reconciliation result.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "receipt_id",
+    "schema_version",
+    "agent_id",
+    "task_id",
+    "capability_id",
+    "grant_decision_ref",
+    "policy_decision_ref",
+    "operation",
+    "repository",
+    "object_type",
+    "object_id",
+    "before_state_digest",
+    "preflight_policy_decision",
+    "execution_result",
+    "provider_object_version",
+    "after_state_digest",
+    "timestamp"
+  ],
+  "properties": {
+    "receipt_id": {
+      "type": "string",
+      "pattern": "^gitea-sovereign:receipt:[A-Za-z0-9._:-]+$"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "agent_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capability_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "grant_decision_ref": {
+      "type": "string",
+      "description": "Reference to the mcp-a2a-zero-trust or equivalent grant decision."
+    },
+    "policy_decision_ref": {
+      "type": "string",
+      "description": "Reference to the PolicyPlane/policy-fabric decision."
+    },
+    "operation": {
+      "type": "string",
+      "enum": [
+        "forge.repository.read",
+        "forge.pull_request.read",
+        "forge.branch.read",
+        "forge.commit.read",
+        "forge.checks.read",
+        "forge.issue.read",
+        "forge.diff.read",
+        "forge.pull_request.merge",
+        "forge.pull_request.close",
+        "forge.branch.delete",
+        "forge.issue.close",
+        "forge.label.apply",
+        "forge.comment.create",
+        "forge.release.create"
+      ]
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["forge", "owner", "name"],
+      "properties": {
+        "forge": {
+          "type": "string",
+          "enum": ["gitea", "github", "forgejo", "gitlab"]
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "object_type": {
+      "type": "string",
+      "enum": ["repository", "pull_request", "branch", "commit", "check", "issue", "label", "comment", "release"]
+    },
+    "object_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "before_state_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "preflight_policy_decision": {
+      "type": "string",
+      "enum": ["allow", "deny", "requires_human_review"]
+    },
+    "execution_result": {
+      "type": "string",
+      "enum": ["success", "rejected", "failed", "ambiguous_mutation_state", "noop"]
+    },
+    "provider_request_id": {
+      "type": "string"
+    },
+    "provider_object_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "commit_sha_or_merge_sha_or_state_marker": {
+      "type": "string"
+    },
+    "after_state_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "reconciliation_result_id": {
+      "type": "string",
+      "pattern": "^gitea-sovereign:reconciliation:[A-Za-z0-9._:-]+$"
+    },
+    "svf_receipt_ref": {
+      "type": "string",
+      "pattern": "^svf:receipt:[A-Za-z0-9._:-]+$"
+    },
+    "receipt_export_cursor": {
+      "type": "string"
+    },
+    "failure_event_type": {
+      "type": "string",
+      "enum": [
+        "tool.schema_error",
+        "tool.permission_denied",
+        "tool.rate_limited",
+        "tool.provider_unavailable",
+        "tool.execution_failed",
+        "tool.ambiguous_mutation_state",
+        "policy.capability_mismatch",
+        "policy.expired_capability",
+        "policy.stale_state",
+        "policy.protected_path",
+        "policy.failed_checks",
+        "policy.review_blocker",
+        "policy.unauthorized_close",
+        "policy.unsafe_branch_delete",
+        "reconciliation.failed",
+        "reconciliation.divergent_state",
+        "grant.replay_detected",
+        "grant.scope_widening_detected",
+        "audit.truncation_detected",
+        "agent.false_completion_claim",
+        "agent.retry_loop",
+        "agent.memory_as_truth"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number", "integer", "boolean", "null"]
+      }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "value"],
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "enum": ["sha256", "sha512", "blake3"]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 32
+        }
+      }
+    }
+  }
+}
