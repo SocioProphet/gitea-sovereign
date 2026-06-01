@@ -38,6 +38,7 @@ const REQUIRED_FILES = [
   'test/receipt-export.test.js',
   'test/local-mvp.test.js',
   'test/runtime-config.test.js',
+  'test/runtime-adapter-contract.test.js',
   'docs/authority-boundaries.md',
   'docs/transport-boundary.md',
   'docs/threat-model.md',
@@ -47,6 +48,7 @@ const REQUIRED_FILES = [
   'docs/local-mvp-demo.md',
   'docs/canonicalization.md',
   'docs/path-boundary.md',
+  'docs/runtime-adapter-contract.md',
   'docs/adr/0001-authority-boundaries.md',
   'docs/adr/0002-token-gateway-vs-native-gitea-token.md',
   'docs/adr/0003-audit-chain-and-export.md',
@@ -56,6 +58,7 @@ const REQUIRED_FILES = [
   'examples/valid/token.example.json',
   'examples/valid/intent.example.json',
   'examples/valid/runtime-config.disabled.example.json',
+  'examples/valid/runtime-adapter.disabled.example.json',
   'examples/attacks/replay-nonce.attack.json',
   'examples/attacks/path-traversal.attack.json',
   'examples/attacks/direct-gitea-bypass.attack.json',
@@ -148,6 +151,21 @@ if (runtimeDisabled) {
   if (runtimeDisabled.bindings.git_transport.mode !== 'disabled') fail('runtime disabled fixture git transport mode must be disabled');
   for (const key of Object.keys(runtimeDisabled.guards)) {
     if (runtimeDisabled.guards[key] !== true) fail(`runtime disabled fixture guard must be true: ${key}`);
+  }
+}
+
+const adapterDisabled = readJson('examples/valid/runtime-adapter.disabled.example.json');
+if (adapterDisabled) {
+  if (adapterDisabled.adapter_status !== 'design-only') fail('runtime adapter fixture must remain design-only');
+  if (adapterDisabled.runtime_binding_enabled !== false) fail('runtime adapter fixture must keep binding disabled');
+  for (const field of ['operation_status', 'operation_digest', 'receipt_hash', 'audit_event_ref', 'failure_reason']) {
+    if (!adapterDisabled.allowed_outputs.includes(field)) fail(`runtime adapter fixture must allow evidence field: ${field}`);
+  }
+  for (const field of ['raw_material', 'native_token', 'access_token', 'password', 'secret']) {
+    if (!adapterDisabled.forbidden_outputs.includes(field)) fail(`runtime adapter fixture must forbid sensitive field: ${field}`);
+  }
+  for (const item of ['service_unavailable', 'rejected_response', 'stale_reference', 'malformed_operation']) {
+    if (!adapterDisabled.required_fail_closed_cases.includes(item)) fail(`runtime adapter fixture must require fail-closed case: ${item}`);
   }
 }
 
@@ -271,6 +289,11 @@ for (const phrase of ['authorization-path handling must fail closed', 'deny-wins
 const runtimeAdr = fs.existsSync(path.join(ROOT, 'docs/adr/0006-runtime-binding-gates.md')) ? readText('docs/adr/0006-runtime-binding-gates.md').toLowerCase() : '';
 for (const phrase of ['runtime binding gates', 'explicit reviewed runtime-mode gate', 'fail-closed behavior', 'local scaffold behavior preserved']) {
   if (!runtimeAdr.includes(phrase)) fail(`runtime binding ADR must mention: ${phrase}`);
+}
+
+const adapterContract = fs.existsSync(path.join(ROOT, 'docs/runtime-adapter-contract.md')) ? readText('docs/runtime-adapter-contract.md').toLowerCase() : '';
+for (const phrase of ['design scaffold only', 'does not enable runtime behavior', 'required adapter phases', 'evidence-shaped data only']) {
+  if (!adapterContract.includes(phrase)) fail(`runtime adapter contract must mention: ${phrase}`);
 }
 
 const compose = fs.existsSync(path.join(ROOT, 'deploy/local/docker-compose.yml')) ? readText('deploy/local/docker-compose.yml') : '';
