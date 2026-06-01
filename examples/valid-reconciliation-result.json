@@ -1,0 +1,47 @@
+{
+  "reconciliation_result_id": "gitea-sovereign:reconciliation:demo-clean-merge-001",
+  "schema_version": "0.1.0",
+  "receipt_id": "gitea-sovereign:receipt:demo-clean-merge-001",
+  "repository": {
+    "forge": "gitea",
+    "owner": "SocioProphet",
+    "name": "demo-repo",
+    "node_id": "node.local.dev",
+    "url": "https://gitea.local/SocioProphet/demo-repo"
+  },
+  "object_type": "pull_request",
+  "object_id": "42",
+  "expected_state": {
+    "state_digest": {
+      "algorithm": "sha256",
+      "value": "2222222222222222222222222222222222222222222222222222222222222222"
+    },
+    "facts": {
+      "merged": true,
+      "merge_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "state": "closed"
+    }
+  },
+  "observed_state": {
+    "state_digest": {
+      "algorithm": "sha256",
+      "value": "2222222222222222222222222222222222222222222222222222222222222222"
+    },
+    "facts": {
+      "merged": true,
+      "merge_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "state": "closed"
+    }
+  },
+  "source_of_truth_read_timestamp": "2026-06-01T12:00:03Z",
+  "source_of_truth_object_version": "pr-42-merged-a1b2c3d4",
+  "classification": "verified_success",
+  "reason": "Post-action Gitea source-of-truth read matched expected merged state and merge SHA.",
+  "svf_receipt_ref": "svf:receipt:demo-clean-merge-001",
+  "receipt_export_cursor": "cursor.demo.000001",
+  "followup_required": false,
+  "metadata": {
+    "example": true,
+    "purpose": "valid reconciliation fixture proving provider receipt completion"
+  }
+}
