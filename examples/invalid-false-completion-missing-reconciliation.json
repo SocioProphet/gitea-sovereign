@@ -1,0 +1,46 @@
+{
+  "case_id": "invalid.false-completion.missing-reconciliation.001",
+  "schema_version": "0.1.0",
+  "description": "Negative fixture: a provider receipt exists, but no source-of-truth reconciliation result exists. The task must not be marked complete.",
+  "provider_receipt": {
+    "receipt_id": "gitea-sovereign:receipt:demo-false-completion-001",
+    "schema_version": "0.1.0",
+    "agent_id": "agent.gitops.pr-janitor.v1",
+    "task_id": "task.demo.false-completion.001",
+    "capability_id": "cap.demo.false-completion.001",
+    "grant_decision_ref": "mcp-a2a:grant:demo-false-completion-001",
+    "policy_decision_ref": "policy-fabric:decision:demo-false-completion-001",
+    "operation": "forge.pull_request.merge",
+    "repository": {
+      "forge": "gitea",
+      "owner": "SocioProphet",
+      "name": "demo-repo",
+      "node_id": "node.local.dev",
+      "url": "https://gitea.local/SocioProphet/demo-repo"
+    },
+    "object_type": "pull_request",
+    "object_id": "43",
+    "before_state_digest": {
+      "algorithm": "sha256",
+      "value": "3333333333333333333333333333333333333333333333333333333333333333"
+    },
+    "preflight_policy_decision": "allow",
+    "execution_result": "success",
+    "provider_request_id": "gitea-request-demo-002",
+    "provider_object_version": "pr-43-head-b1c2d3e4",
+    "commit_sha_or_merge_sha_or_state_marker": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "after_state_digest": {
+      "algorithm": "sha256",
+      "value": "4444444444444444444444444444444444444444444444444444444444444444"
+    },
+    "timestamp": "2026-06-01T12:05:00Z",
+    "metadata": {
+      "example": true,
+      "purpose": "receipt without reconciliation must not complete task"
+    }
+  },
+  "missing_reconciliation_result": true,
+  "expected_task_completion_state": "blocked_missing_reconciliation",
+  "expected_failure_event_type": "agent.false_completion_claim",
+  "expected_policy": "A provider receipt is Tier 3 evidence only. Completion requires Tier 4 or Tier 5 evidence through ReconciliationResult."
+}
