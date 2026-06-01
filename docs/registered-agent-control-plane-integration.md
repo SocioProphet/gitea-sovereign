@@ -8,7 +8,7 @@ This document defines the initial integration boundary between `gitea-sovereign`
 
 ## Architectural Role
 
-`gitea-sovereign` owns the sovereign forge boundary for SocioProphet.
+`gitea-sovereign` owns the local sovereign forge substrate boundary for SocioProphet.
 
 The registered-agent control plane should be split as follows:
 
@@ -29,6 +29,66 @@ External forge adapters
 ```
 
 GitHub is not the normative architecture. GitHub is one external adapter. `gitea-sovereign` is the sovereign substrate that defines the desired control semantics for self-hosted source-control operations.
+
+## Ecosystem Alignment and Authority Boundaries
+
+`gitea-sovereign` must integrate with the broader SocioProphet estate without absorbing responsibilities owned by other control-plane systems.
+
+The authority model is:
+
+```text
+Sociosphere
+  = canonical workspace and governance controller
+  = repository estate controller
+  = governance graph / active-spine authority
+
+Prophet Platform
+  = runtime and deployment hub
+  = orchestration, receipt workflow, dashboarding, promotion workflow
+
+AgentPlane
+  = execution/evidence bridge between decisions and side-effecting tools
+
+PolicyPlane / policy-fabric
+  = authorization and side-effect boundary control
+
+Ontogenesis
+  = ontology, schema semantics, SHACL-style meaning layer, promotion semantics
+
+TriTRPC
+  = typed transport and RPC contract lane
+
+mcp-a2a-zero-trust
+  = grant decision endpoint and zero-trust agent interoperability boundary
+
+model-governance-ledger
+  = receipt export sink and model/action governance audit lane
+
+gitea-sovereign
+  = local-only L0 source-control substrate
+  = Gitea substrate boundary
+  = token gateway boundary, once authorized
+  = intent and audit projection source
+  = receipt-export producer
+```
+
+Therefore, `gitea-sovereign` does not replace the canonical governance graph, workspace controller, promotion system, policy system, ontology system, or runtime hub. It emits forge state, intent records, token events, audit events, and mutation receipts into those systems.
+
+The expected evidence path is:
+
+```text
+gitea-sovereign receipt
+  -> receipt-export-cursor
+  -> Sociosphere governance graph
+  -> SVF receipt reference
+  -> Prophet Platform runtime / promotion workflow
+  -> AgentPlane evidence bridge
+  -> PolicyPlane authorization trail
+  -> Ontogenesis semantic validation
+  -> model-governance-ledger audit sink
+```
+
+`gitea-sovereign` may be the source of local forge facts, but Sociosphere remains the canonical control graph and workspace authority. Completion and promotion decisions must be represented in the governance graph and receipt fabric, not only in local Gitea state.
 
 ## Non-Goals for the Initial L0 / PR-A Scope
 
@@ -261,6 +321,8 @@ The initial integration is acceptable when:
 6. No registered agent can mark a mutation complete without a reconciliation result.
 7. No direct model-to-Gitea write path exists.
 8. All future token issuance work is explicitly downstream of capability, policy, receipt, and reconciliation controls.
+9. Forge receipts are exportable into Sociosphere/SVF receipt references and the model-governance-ledger.
+10. Local forge state is not treated as a replacement for the Sociosphere governance graph.
 
 ## Backlog
 
@@ -272,3 +334,7 @@ The initial integration is acceptable when:
 6. Add policy fixtures for clean merge, failed checks, protected path, stale state, expired capability, and target mismatch.
 7. Add threat-model tests that force ambiguous mutation state and prove no success claim is emitted.
 8. Add Sociosphere integration notes mapping `TaskContract`, `CapabilityGrant`, `ProviderReceipt`, and `ReconciliationResult` into the governance graph.
+9. Add SVF receipt-reference mapping for forge receipts.
+10. Add model-governance-ledger receipt export cursor semantics.
+11. Add Ontogenesis semantic validation hooks for forge adapter schemas and promotion semantics.
+12. Add AgentPlane evidence bridge mapping for side-effecting forge operations.
