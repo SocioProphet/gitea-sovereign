@@ -1,0 +1,41 @@
+{
+  "binding_status": "planning-only",
+  "runtime_binding_enabled": false,
+  "contract_ref": "docs/ledger-export-binding-contract.md",
+  "consumer_issue_ref": "SocioProphet/model-governance-ledger#24",
+  "producer_role": "source-control-receipt-producer",
+  "consumer_role": "canonical-evidence-receipt-consumer",
+  "export_path": "audit-log->export-cursor->model-governance-ledger",
+  "required_inputs": [
+    "runtime_config",
+    "verified_audit_chain",
+    "export_cursor_state",
+    "contiguous_event_range",
+    "destination_reference",
+    "consumer_contract_reference",
+    "timeout_retry_policy",
+    "dependency_health_state"
+  ],
+  "required_outputs": [
+    "export_batch_id",
+    "first_seq",
+    "last_seq",
+    "batch_hash",
+    "destination_ref",
+    "ack_hash",
+    "audit_event_ref",
+    "failure_reason"
+  ],
+  "fail_closed_cases": [
+    "missing_consumer_contract",
+    "dependency_unavailable",
+    "timeout",
+    "malformed_acknowledgement",
+    "acknowledgement_hash_mismatch",
+    "unsupported_consumer_version",
+    "sequence_gap",
+    "audit_chain_verification_failure",
+    "duplicate_batch_rejection"
+  ],
+  "audit_before_export_required": true
+}
