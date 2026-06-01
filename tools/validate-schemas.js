@@ -59,6 +59,7 @@ const REQUIRED_FILES = [
   'docs/ledger-export-binding-contract.md',
   'docs/local-runtime-demo-plan.md',
   'docs/registered-agent-control-plane-integration.md',
+  'docs/registered-agent-validation-matrix.md',
   'docs/validation.md',
   'docs/adr/0001-authority-boundaries.md',
   'docs/adr/0002-token-gateway-vs-native-gitea-token.md',
@@ -378,6 +379,11 @@ for (const phrase of ['authorization-path handling must fail closed', 'deny-wins
 const validationDoc = fs.existsSync(path.join(ROOT, 'docs/validation.md')) ? readText('docs/validation.md').toLowerCase() : '';
 for (const phrase of ['make validate', 'write capabilities must require provider receipts and reconciliation', 'pr-a write capabilities must be single-use', 'providerreceipt', 'reconciliationresult']) {
   if (!validationDoc.includes(phrase)) fail(`validation doc must mention: ${phrase}`);
+}
+
+const validationMatrix = fs.existsSync(path.join(ROOT, 'docs/registered-agent-validation-matrix.md')) ? readText('docs/registered-agent-validation-matrix.md').toLowerCase() : '';
+for (const phrase of ['failure-class coverage', 'fc-001', 'fc-023', 'coverage gaps', 'make validate must pass in ci']) {
+  if (!validationMatrix.includes(phrase)) fail(`registered-agent validation matrix must mention: ${phrase}`);
 }
 
 const runtimeAdr = fs.existsSync(path.join(ROOT, 'docs/adr/0006-runtime-binding-gates.md')) ? readText('docs/adr/0006-runtime-binding-gates.md').toLowerCase() : '';
