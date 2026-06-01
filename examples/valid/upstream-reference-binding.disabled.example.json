@@ -1,0 +1,34 @@
+{
+  "binding_status": "planning-only",
+  "runtime_binding_enabled": false,
+  "contract_ref": "docs/upstream-reference-binding-contract.md",
+  "owning_systems": [
+    "policy-fabric",
+    "mcp-a2a-zero-trust"
+  ],
+  "local_states": [
+    "ok",
+    "block",
+    "stale",
+    "unknown"
+  ],
+  "fail_closed_cases": [
+    "dependency_unavailable",
+    "timeout",
+    "malformed_response",
+    "missing_decision_id",
+    "stale_cache",
+    "integrity_mismatch",
+    "unsupported_version"
+  ],
+  "write_unknown_behavior": "stop",
+  "required_evidence_fields": [
+    "upstream_system_id",
+    "upstream_reference_id",
+    "mapped_local_state",
+    "decision_digest",
+    "dependency_health_summary",
+    "audit_event_ref",
+    "failure_reason"
+  ]
+}
