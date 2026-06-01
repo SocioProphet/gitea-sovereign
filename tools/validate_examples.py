@@ -5,6 +5,7 @@ This is intentionally not a full JSON Schema implementation. It enforces the
 completion-proof invariant for the current scaffold:
 
 - write capabilities must require provider receipts and reconciliation;
+- PR-A write capabilities must be single-use;
 - a ProviderReceipt alone is not task completion proof;
 - a ReconciliationResult with verified classification is the completion gate;
 - the negative false-completion fixture must remain blocked.
@@ -47,10 +48,9 @@ def require_fields(name: str, value: dict[str, Any], fields: list[str]) -> None:
         raise ValidationError(f"{name}: missing required fields: {', '.join(missing)}")
 
 
-def validate_capability_grant() -> dict[str, Any]:
-    grant = load_json("examples/valid-capability-grant.json")
+def require_valid_write_capability(name: str, grant: dict[str, Any]) -> None:
     require_fields(
-        "valid-capability-grant",
+        name,
         grant,
         [
             "capability_id",
@@ -71,28 +71,101 @@ def validate_capability_grant() -> dict[str, Any]:
         ],
     )
     if grant["schema_version"] != "0.1.0":
-        raise ValidationError("valid-capability-grant: schema_version must be 0.1.0")
+        raise ValidationError(f"{name}: schema_version must be 0.1.0")
     if grant["operation"] not in WRITE_OPERATIONS:
-        raise ValidationError("valid-capability-grant: expected a write operation")
+        raise ValidationError(f"{name}: expected a write operation")
     if grant["max_uses"] != 1:
-        raise ValidationError("valid-capability-grant: write capability must be single-use in PR-A examples")
+        raise ValidationError(f"{name}: write capability must be single-use in PR-A examples")
     if grant["status"] != "issued":
-        raise ValidationError("valid-capability-grant: expected issued status")
+        raise ValidationError(f"{name}: expected issued status")
     constraints = grant["constraints"]
     require_fields(
-        "valid-capability-grant.constraints",
+        f"{name}.constraints",
         constraints,
         ["freshness_seconds", "require_receipt", "require_reconciliation"],
     )
     if constraints["require_receipt"] is not True:
-        raise ValidationError("valid-capability-grant: write capability must require receipt")
+        raise ValidationError(f"{name}: write capability must require receipt")
     if constraints["require_reconciliation"] is not True:
-        raise ValidationError("valid-capability-grant: write capability must require reconciliation")
+        raise ValidationError(f"{name}: write capability must require reconciliation")
     if constraints.get("freshness_seconds", 0) > 900:
-        raise ValidationError("valid-capability-grant: freshness_seconds must not exceed 900")
+        raise ValidationError(f"{name}: freshness_seconds must not exceed 900")
     if constraints.get("allow_destructive_action") is True:
-        raise ValidationError("valid-capability-grant: destructive actions are not permitted in PR-A example")
+        raise ValidationError(f"{name}: destructive actions are not permitted in PR-A example")
+
+
+def expect_rejected(name: str, func: Any, expected_fragment: str) -> None:
+    try:
+        func()
+    except ValidationError as exc:
+        if expected_fragment not in str(exc):
+            raise ValidationError(f"{name}: wrong rejection reason: {exc}") from exc
+        return
+    raise ValidationError(f"{name}: fixture unexpectedly passed validation")
+
+
+def validate_capability_grant() -> dict[str, Any]:
+    grant = load_json("examples/valid-capability-grant.json")
+    require_valid_write_capability("valid-capability-grant", grant)
     return grant
+
+
+def validate_invalid_capability_missing_reconciliation() -> None:
+    case = load_json("examples/invalid-capability-missing-reconciliation.json")
+    require_fields(
+        "invalid-capability-missing-reconciliation",
+        case,
+        [
+            "case_id",
+            "schema_version",
+            "description",
+            "capability_grant",
+            "expected_task_completion_state",
+            "expected_failure_event_type",
+            "expected_policy",
+        ],
+    )
+    if case["expected_task_completion_state"] != "rejected_missing_reconciliation_requirement":
+        raise ValidationError("invalid-capability-missing-reconciliation: unexpected expected_task_completion_state")
+    if case["expected_failure_event_type"] != "policy.capability_mismatch":
+        raise ValidationError("invalid-capability-missing-reconciliation: expected policy.capability_mismatch")
+    expect_rejected(
+        "invalid-capability-missing-reconciliation",
+        lambda: require_valid_write_capability(
+            "invalid-capability-missing-reconciliation.capability_grant",
+            case["capability_grant"],
+        ),
+        "must require reconciliation",
+    )
+
+
+def validate_invalid_capability_multi_use_write() -> None:
+    case = load_json("examples/invalid-capability-multi-use-write.json")
+    require_fields(
+        "invalid-capability-multi-use-write",
+        case,
+        [
+            "case_id",
+            "schema_version",
+            "description",
+            "capability_grant",
+            "expected_task_completion_state",
+            "expected_failure_event_type",
+            "expected_policy",
+        ],
+    )
+    if case["expected_task_completion_state"] != "rejected_multi_use_write_capability":
+        raise ValidationError("invalid-capability-multi-use-write: unexpected expected_task_completion_state")
+    if case["expected_failure_event_type"] != "policy.capability_mismatch":
+        raise ValidationError("invalid-capability-multi-use-write: expected policy.capability_mismatch")
+    expect_rejected(
+        "invalid-capability-multi-use-write",
+        lambda: require_valid_write_capability(
+            "invalid-capability-multi-use-write.capability_grant",
+            case["capability_grant"],
+        ),
+        "single-use",
+    )
 
 
 def validate_provider_receipt(grant: dict[str, Any]) -> dict[str, Any]:
@@ -200,10 +273,12 @@ def validate_false_completion_negative() -> None:
 
 def main() -> int:
     grant = validate_capability_grant()
+    validate_invalid_capability_missing_reconciliation()
+    validate_invalid_capability_multi_use_write()
     receipt = validate_provider_receipt(grant)
     validate_reconciliation_result(receipt)
     validate_false_completion_negative()
-    print("validated capability grant, provider receipt, reconciliation result, and false-completion negative fixture")
+    print("validated capability grant, capability negatives, provider receipt, reconciliation result, and false-completion negative fixture")
     return 0
 
 
