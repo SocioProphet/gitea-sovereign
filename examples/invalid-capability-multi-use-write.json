@@ -1,0 +1,43 @@
+{
+  "case_id": "invalid.capability.multi-use-write.001",
+  "schema_version": "0.1.0",
+  "description": "Negative fixture: a PR-A write capability with max_uses greater than one must be rejected.",
+  "capability_grant": {
+    "capability_id": "cap.demo.invalid-multi-use-write.001",
+    "schema_version": "0.1.0",
+    "agent_id": "agent.gitops.pr-janitor.v1",
+    "task_id": "task.demo.invalid-multi-use-write.001",
+    "grant_decision_ref": "mcp-a2a:grant:demo-invalid-multi-use-write-001",
+    "policy_decision_ref": "policy-fabric:decision:demo-invalid-multi-use-write-001",
+    "operation": "forge.pull_request.merge",
+    "repository": {
+      "forge": "gitea",
+      "owner": "SocioProphet",
+      "name": "demo-repo",
+      "node_id": "node.local.dev",
+      "url": "https://gitea.local/SocioProphet/demo-repo"
+    },
+    "object_type": "pull_request",
+    "object_id": "45",
+    "constraints": {
+      "freshness_seconds": 300,
+      "expected_head": "d1e2f3a4",
+      "expected_base": "main",
+      "allowed_pull_request": "45",
+      "protected_path_policy": "requires_human_review",
+      "require_checks_success": true,
+      "require_review_clearance": true,
+      "require_receipt": true,
+      "require_reconciliation": true,
+      "allow_destructive_action": false
+    },
+    "issued_at": "2026-06-01T12:20:00Z",
+    "expires_at": "2026-06-01T12:25:00Z",
+    "max_uses": 2,
+    "uses_remaining": 2,
+    "status": "issued"
+  },
+  "expected_task_completion_state": "rejected_multi_use_write_capability",
+  "expected_failure_event_type": "policy.capability_mismatch",
+  "expected_policy": "Every PR-A write capability must be single-use. Multi-use write capabilities expand blast radius and are rejected."
+}
