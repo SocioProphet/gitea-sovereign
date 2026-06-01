@@ -39,6 +39,7 @@ const REQUIRED_FILES = [
   'test/local-mvp.test.js',
   'test/runtime-config.test.js',
   'test/runtime-adapter-contract.test.js',
+  'test/upstream-reference-binding-contract.test.js',
   'docs/authority-boundaries.md',
   'docs/transport-boundary.md',
   'docs/threat-model.md',
@@ -49,6 +50,7 @@ const REQUIRED_FILES = [
   'docs/canonicalization.md',
   'docs/path-boundary.md',
   'docs/runtime-adapter-contract.md',
+  'docs/upstream-reference-binding-contract.md',
   'docs/adr/0001-authority-boundaries.md',
   'docs/adr/0002-token-gateway-vs-native-gitea-token.md',
   'docs/adr/0003-audit-chain-and-export.md',
@@ -59,6 +61,7 @@ const REQUIRED_FILES = [
   'examples/valid/intent.example.json',
   'examples/valid/runtime-config.disabled.example.json',
   'examples/valid/runtime-adapter.disabled.example.json',
+  'examples/valid/upstream-reference-binding.disabled.example.json',
   'examples/attacks/replay-nonce.attack.json',
   'examples/attacks/path-traversal.attack.json',
   'examples/attacks/direct-gitea-bypass.attack.json',
@@ -167,6 +170,22 @@ if (adapterDisabled) {
   for (const item of ['service_unavailable', 'rejected_response', 'stale_reference', 'malformed_operation']) {
     if (!adapterDisabled.required_fail_closed_cases.includes(item)) fail(`runtime adapter fixture must require fail-closed case: ${item}`);
   }
+}
+
+const upstreamDisabled = readJson('examples/valid/upstream-reference-binding.disabled.example.json');
+if (upstreamDisabled) {
+  if (upstreamDisabled.binding_status !== 'planning-only') fail('upstream reference binding fixture must remain planning-only');
+  if (upstreamDisabled.runtime_binding_enabled !== false) fail('upstream reference binding fixture must keep binding disabled');
+  for (const system of ['policy-fabric', 'mcp-a2a-zero-trust']) {
+    if (!upstreamDisabled.owning_systems.includes(system)) fail(`upstream binding fixture must name owning system: ${system}`);
+  }
+  for (const state of ['ok', 'block', 'stale', 'unknown']) {
+    if (!upstreamDisabled.local_states.includes(state)) fail(`upstream binding fixture must include local state: ${state}`);
+  }
+  for (const item of ['dependency_unavailable', 'timeout', 'malformed_response', 'missing_decision_id', 'stale_cache', 'integrity_mismatch', 'unsupported_version']) {
+    if (!upstreamDisabled.fail_closed_cases.includes(item)) fail(`upstream binding fixture must require fail-closed case: ${item}`);
+  }
+  if (upstreamDisabled.write_unknown_behavior !== 'stop') fail('upstream binding fixture must stop write-class unknown outcomes');
 }
 
 const token = readJson('schemas/token.schema.json');
@@ -294,6 +313,11 @@ for (const phrase of ['runtime binding gates', 'explicit reviewed runtime-mode g
 const adapterContract = fs.existsSync(path.join(ROOT, 'docs/runtime-adapter-contract.md')) ? readText('docs/runtime-adapter-contract.md').toLowerCase() : '';
 for (const phrase of ['design scaffold only', 'does not enable runtime behavior', 'required adapter phases', 'evidence-shaped data only']) {
   if (!adapterContract.includes(phrase)) fail(`runtime adapter contract must mention: ${phrase}`);
+}
+
+const upstreamContract = fs.existsSync(path.join(ROOT, 'docs/upstream-reference-binding-contract.md')) ? readText('docs/upstream-reference-binding-contract.md').toLowerCase() : '';
+for (const phrase of ['planning scaffold only', 'policy fabric', 'mcp/a2a zero trust', 'write-class operations must stop on `unknown`']) {
+  if (!upstreamContract.includes(phrase)) fail(`upstream reference binding contract must mention: ${phrase}`);
 }
 
 const compose = fs.existsSync(path.join(ROOT, 'deploy/local/docker-compose.yml')) ? readText('deploy/local/docker-compose.yml') : '';
