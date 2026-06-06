@@ -1,0 +1,44 @@
+{
+  "case_id": "invalid.capability.moved-head.001",
+  "schema_version": "0.1.0",
+  "description": "Negative fixture: a write capability whose expected head no longer matches the source-of-truth head must be rejected before execution.",
+  "capability_grant": {
+    "capability_id": "cap.demo.invalid-moved-head.001",
+    "schema_version": "0.1.0",
+    "agent_id": "agent.gitops.pr-janitor.v1",
+    "task_id": "task.demo.invalid-moved-head.001",
+    "grant_decision_ref": "mcp-a2a:grant:demo-invalid-moved-head-001",
+    "policy_decision_ref": "policy-fabric:decision:demo-invalid-moved-head-001",
+    "operation": "forge.pull_request.merge",
+    "repository": {
+      "forge": "gitea",
+      "owner": "SocioProphet",
+      "name": "demo-repo",
+      "node_id": "node.local.dev",
+      "url": "https://gitea.local/SocioProphet/demo-repo"
+    },
+    "object_type": "pull_request",
+    "object_id": "47",
+    "constraints": {
+      "freshness_seconds": 300,
+      "expected_head": "f1a2b3c4",
+      "expected_base": "main",
+      "allowed_pull_request": "47",
+      "protected_path_policy": "requires_human_review",
+      "require_checks_success": true,
+      "require_review_clearance": true,
+      "require_receipt": true,
+      "require_reconciliation": true,
+      "allow_destructive_action": false
+    },
+    "issued_at": "2026-06-01T12:40:00Z",
+    "expires_at": "2026-06-01T12:45:00Z",
+    "max_uses": 1,
+    "uses_remaining": 1,
+    "status": "issued"
+  },
+  "source_of_truth_head": "99999999",
+  "expected_task_completion_state": "rejected_moved_head",
+  "expected_failure_event_type": "policy.stale_state",
+  "expected_policy": "Every write capability must bind the expected head. If the source-of-truth head differs from constraints.expected_head, execution must be rejected."
+}
