@@ -1,0 +1,41 @@
+{
+  "review_status": "blocked",
+  "production_deployment_enabled": false,
+  "contract_ref": "docs/production-deployment-review.md",
+  "required_gates": [
+    "runtime_config_disabled_default",
+    "runtime_adapter_negative_tests",
+    "upstream_bindings_implemented",
+    "ledger_consumer_contract_implemented",
+    "local_runtime_demo_passed",
+    "git_transport_disabled_or_enforced",
+    "production_grade_canonicalization",
+    "secret_storage_key_rotation_reviewed",
+    "dependency_outage_fail_closed",
+    "rollback_incident_response_ready",
+    "safe_observability",
+    "sociosphere_prophet_platform_contracts_reviewed"
+  ],
+  "required_review_artifacts": [
+    "threat_model_update",
+    "data_flow_diagram",
+    "trust_boundary_diagram",
+    "dependency_inventory",
+    "secret_key_management_plan",
+    "evidence_audit_retention_plan",
+    "rollback_plan",
+    "incident_response_runbook",
+    "deployment_topology",
+    "operational_readiness_checklist",
+    "sign_off_record"
+  ],
+  "forbidden_until_approved": [
+    "production_deployment",
+    "deployment_manifests",
+    "hosted_service_creation",
+    "infrastructure_mutation",
+    "public_endpoint_exposure",
+    "transport_enablement",
+    "runtime_behavior_changes"
+  ]
+}
